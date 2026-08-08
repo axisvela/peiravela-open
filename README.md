@@ -34,11 +34,21 @@ The JS client is the same surface in an ES module:
 import PeiravelaClient from "./sdk/js/peiravela.js";
 ```
 
+A compilable example is in `examples/ts-client/`:
+
+```sh
+cd examples/ts-client
+npm install
+npm run typecheck
+```
+
 ## Prebuilt binaries
 
 Binaries are built from the AGPL-3.0 core and distributed under AGPL-3.0 terms
 (see the `peiravela` repository). Release assets are attached to the tags on
-this repository's Releases page; each build records its core source revision.
+this repository's Releases page; the build workflow checks out the private core
+and requires the `PEIRAVELA_CORE_CHECKOUT_TOKEN` secret (a repo-scoped PAT with
+read access to `axisrobo/peiravela`) until the core is made public.
 
 ## Studio
 

@@ -6,6 +6,13 @@ on:
       - "v*"
   workflow_dispatch:
 
+# The binaries are built from the AGPL core repository (axisrobo/peiravela),
+# which is currently private. The checkout needs a repository-scoped PAT with
+# read access to that repo, stored as the PEIRAVELA_CORE_CHECKOUT_TOKEN secret
+# in this repository. When the core becomes public the secret is unnecessary.
+env:
+  CORE_CHECKOUT_TOKEN: ${{ secrets.PEIRAVELA_CORE_CHECKOUT_TOKEN }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +21,13 @@ jobs:
         with:
           repository: axisrobo/peiravela
           path: core
+          token: ${{ env.CORE_CHECKOUT_TOKEN }}
+
+      - name: Checkout is not required to be public
+        run: |
+          if [ -z "$CORE_CHECKOUT_TOKEN" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "PEIRAVELA_CORE_CHECKOUT_TOKEN is not set; configure a PAT with read access to axisrobo/peiravela to build binaries from the private core."
+          fi
 
       - uses: actions/setup-go@v5
         with:
