@@ -1,0 +1,41 @@
+name: SDK validation
+
+on:
+  push:
+    paths:
+      - "sdk/**"
+      - "contracts/**"
+      - "examples/**"
+      - "studio/**"
+      - ".github/workflows/sdk.yml"
+  pull_request:
+    paths:
+      - "sdk/**"
+      - "contracts/**"
+      - "examples/**"
+      - "studio/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: OpenAPI and schemas are valid JSON
+        run: |
+          node -e "const fs=require('fs');const files=['contracts/openapi/peiravela-v1.openapi.json',...fs.readdirSync('contracts/schemas').filter(f=>f.endsWith('.json')).map(f=>'contracts/schemas/'+f)];for(const f of files){JSON.parse(fs.readFileSync(f,'utf8'));console.log('ok',f)}"
+
+      - name: JS client and examples parse
+        run: |
+          node --check sdk/js/peiravela.js
+          node --check examples/js-client/demo.mjs
+
+      - name: TypeScript client typechecks
+        working-directory: examples/ts-client
+        run: |
+          npm install --no-audit --no-fund
+          npm run typecheck
