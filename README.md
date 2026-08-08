@@ -42,6 +42,8 @@ npm install
 npm run typecheck
 ```
 
+A JavaScript example is in `examples/js-client/demo.mjs` (ES module).
+
 ## Prebuilt binaries
 
 Binaries are built from the AGPL-3.0 core and distributed under AGPL-3.0 terms
