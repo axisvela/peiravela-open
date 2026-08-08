@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/security-lab-profile-v1.json",
+  "title": "PEIRAVELA Security Lab Profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "id", "version", "domains", "safety_boundary", "provenance"],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "SecurityLabProfile"},
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "domains": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/domain"}},
+    "safety_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["synthetic_or_controlled_targets_only", "public_egress_allowed", "production_credentials_allowed"],
+      "properties": {
+        "synthetic_or_controlled_targets_only": {"const": true},
+        "public_egress_allowed": {"const": false},
+        "production_credentials_allowed": {"const": false}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_label", "source_digest"],
+      "properties": {
+        "state_label": {"enum": ["observed", "replayed", "synthetic", "simulated", "predicted", "derived"]},
+        "source_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+      }
+    }
+  },
+  "$defs": {
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "categories"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["planned", "active", "frozen", "deprecated"]},
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "status", "suite_refs"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "status": {"enum": ["planned", "active", "frozen", "deprecated"]},
+              "suite_refs": {"type": "array", "items": {"type": "string", "minLength": 1}}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/run-manifest-v1.json",
+  "title": "PEIRAVELA RunManifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "experiment_id", "run_id", "attempt_id", "world_digest", "scenario_digest", "seed", "clock", "dependencies", "created_at"],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "RunManifest"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "replaces_attempt_id": {"type": "string", "minLength": 1},
+    "world_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "scenario_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "seed": {"type": ["integer", "string"]},
+    "clock": {"type": "string", "minLength": 1},
+    "dependencies": {"type": "object", "minProperties": 1},
+    "created_at": {"type": "string", "format": "date-time"}
+  }
+}

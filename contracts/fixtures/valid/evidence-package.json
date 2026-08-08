@@ -1,0 +1,19 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "EvidencePackage",
+  "manifest_version": "1.0.0",
+  "attempt_id": "s01-benign-control",
+  "created_at": "2026-08-05T00:00:00Z",
+  "artifacts": [
+    {
+      "kind": "simulation-evidence.json",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "path": "artifacts/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-simulation-evidence.json"
+    },
+    {
+      "kind": "cleanup.json",
+      "digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "path": "artifacts/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-cleanup.json"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "JACoBProfile",
+  "id": "jacob",
+  "version": "1.0.0",
+  "quality_dimensions": [{
+    "id": "reliability-and-composition",
+    "status": "active",
+    "categories": [{"id": "enterprise-workflow-composition", "status": "frozen", "suite_refs": ["iam"]}]
+  }],
+  "evaluation_boundary": {"external_evaluator_required": true, "judgments_owned_by_peiravela": false},
+  "provenance": {"state_label": "synthetic", "source_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+}

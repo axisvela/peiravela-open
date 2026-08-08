@@ -1,0 +1,1200 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "PEIRAVELA Control Plane",
+    "version": "1.0.0",
+    "description": "Northbound REST surface for the PEIRAVELA possible-world experiment control plane. All responses are raw facts; the API does not produce pass/fail or release-gate verdicts. Evidence artifacts are content-addressed (sha256) and immutable."
+  },
+  "servers": [
+    { "url": "/" }
+  ],
+  "tags": [
+    { "name": "discovery", "description": "Provider and SUT capability facts" },
+    { "name": "scenarios", "description": "Scenario compilation and catalog expansion" },
+    { "name": "runs", "description": "Suite, matrix, retained-matrix, and PEIRA-Bench execution" },
+    { "name": "worlds", "description": "Disposable world lifecycle" },
+    { "name": "experiments", "description": "Experiment lifecycle" },
+    { "name": "source-bindings", "description": "Frozen experiment source bindings" },
+    { "name": "branches", "description": "Immutable counterfactual branch records" },
+    { "name": "evidence", "description": "Content-addressed evidence retention and export" },
+    { "name": "audit", "description": "Request audit facts" }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["discovery"],
+        "summary": "Health check",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Health" } } }
+          }
+        }
+      }
+    },
+    "/provider-sandboxes": {
+      "get": {
+        "tags": ["discovery"],
+        "summary": "List sandbox provider capabilities",
+        "operationId": "providerSandboxes",
+        "responses": {
+          "200": {
+            "description": "Provider capability facts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ProviderSandboxList" } } }
+          }
+        }
+      }
+    },
+    "/sut-adapters": {
+      "get": {
+        "tags": ["discovery"],
+        "summary": "List registered SUT adapters",
+        "operationId": "sutAdapters",
+        "responses": {
+          "200": {
+            "description": "SUT adapter facts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SUTAdapterList" } } }
+          }
+        }
+      }
+    },
+    "/scenarios/compile": {
+      "post": {
+        "tags": ["scenarios"],
+        "summary": "Compile a scenario source into provider-neutral IR",
+        "operationId": "compileScenario",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CompileScenarioRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Compiled IR with content addresses",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CompiledScenario" } } }
+          },
+          "400": { "description": "Invalid scenario or schema" }
+        }
+      }
+    },
+    "/catalogs/expand": {
+      "post": {
+        "tags": ["scenarios"],
+        "summary": "Expand a suite catalog into scenario × perturbation plans",
+        "operationId": "expandCatalog",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExpandCatalogRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Expanded plans",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExpandCatalogResponse" } } }
+          },
+          "400": { "description": "Unreadable or invalid catalog" }
+        }
+      }
+    },
+    "/controls/aggregate": {
+      "post": {
+        "tags": ["runs"],
+        "summary": "Aggregate a catalog's recorded attempts by control variant",
+        "operationId": "controlsAggregate",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ControlsAggregateRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Per-control aggregation of evidence facts",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ControlsAggregateResponse" } } }
+          },
+          "400": { "description": "Unreadable catalog or missing artifact root" }
+        }
+      }
+    },
+    "/runs/suite": {
+      "post": {
+        "tags": ["runs"],
+        "summary": "Run one scenario × perturbation",
+        "operationId": "suiteRun",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteRunRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Execution result",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SuiteRunResponse" } } }
+          },
+          "400": { "description": "Invalid catalog, schema, or plan" }
+        }
+      }
+    },
+    "/runs/matrix": {
+      "post": {
+        "tags": ["runs"],
+        "summary": "Run all plans once",
+        "operationId": "matrixRun",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MatrixRunRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Matrix summary",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MatrixRunResponse" } } }
+          },
+          "400": { "description": "Invalid catalog or schema" }
+        }
+      }
+    },
+    "/runs/retained-matrix": {
+      "post": {
+        "tags": ["runs"],
+        "summary": "Run all plans with repetitions, retaining every attempt",
+        "operationId": "retainedMatrixRun",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RetainedMatrixRunRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Retained repetition summary",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RetainedMatrixRunResponse" } } }
+          },
+          "400": { "description": "Invalid catalog or schema" }
+        }
+      }
+    },
+    "/runs/bench": {
+      "post": {
+        "tags": ["runs"],
+        "summary": "Retained PEIRA-Bench report with completeness checks",
+        "operationId": "benchRun",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BenchRunRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "PEIRA-Bench report",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BenchReport" } } }
+          },
+          "400": { "description": "Invalid catalog or schema" }
+        }
+      }
+    },
+    "/runs": {
+      "get": {
+        "tags": ["runs"],
+        "summary": "List runs with their retained attempts",
+        "operationId": "listRuns",
+        "responses": {
+          "200": {
+            "description": "Run records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunListResponse" } } }
+          }
+        }
+      }
+    },
+    "/runs/{run_id}": {
+      "get": {
+        "tags": ["runs"],
+        "summary": "Get a run with its attempts",
+        "operationId": "getRun",
+        "parameters": [{ "$ref": "#/components/parameters/RunID" }],
+        "responses": {
+          "200": {
+            "description": "Run record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunRecord" } } }
+          },
+          "404": { "description": "Run not found" }
+        }
+      },
+      "delete": {
+        "tags": ["runs"],
+        "summary": "Delete a run (cascades attempts, artifacts, cleanup evidence)",
+        "operationId": "deleteRun",
+        "parameters": [{ "$ref": "#/components/parameters/RunID" }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Run not found" }
+        }
+      }
+    },
+    "/runs/{run_id}/state": {
+      "patch": {
+        "tags": ["runs"],
+        "summary": "Transition run state",
+        "operationId": "updateRunState",
+        "parameters": [{ "$ref": "#/components/parameters/RunID" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StateRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated run",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RunRecord" } } }
+          },
+          "404": { "description": "Run not found" }
+        }
+      }
+    },
+    "/runs/{run_id}/attempts/{attempt_id}": {
+      "get": {
+        "tags": ["runs"],
+        "summary": "Get one attempt of a run",
+        "operationId": "getAttempt",
+        "parameters": [{ "$ref": "#/components/parameters/RunID" }, { "$ref": "#/components/parameters/AttemptID" }],
+        "responses": {
+          "200": {
+            "description": "Attempt record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AttemptRecord" } } }
+          },
+          "404": { "description": "Run or attempt not found" }
+        }
+      }
+    },
+    "/worlds": {
+      "post": {
+        "tags": ["worlds"],
+        "summary": "Create a world (starts DRAFT with a lease)",
+        "operationId": "createWorld",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateWorldRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Created world",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldRecord" } } }
+          },
+          "400": { "description": "Invalid world ID, digest, or lease TTL" }
+        }
+      },
+      "get": {
+        "tags": ["worlds"],
+        "summary": "List worlds",
+        "operationId": "listWorlds",
+        "responses": {
+          "200": {
+            "description": "World records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldListResponse" } } }
+          }
+        }
+      }
+    },
+    "/worlds/{world_id}": {
+      "get": {
+        "tags": ["worlds"],
+        "summary": "Get a world",
+        "operationId": "getWorld",
+        "parameters": [{ "$ref": "#/components/parameters/WorldID" }],
+        "responses": {
+          "200": {
+            "description": "World record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldRecord" } } }
+          },
+          "404": { "description": "World not found" }
+        }
+      },
+      "delete": {
+        "tags": ["worlds"],
+        "summary": "Remove the world record",
+        "operationId": "deleteWorld",
+        "parameters": [{ "$ref": "#/components/parameters/WorldID" }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "World not found" }
+        }
+      }
+    },
+    "/worlds/{world_id}/state": {
+      "patch": {
+        "tags": ["worlds"],
+        "summary": "Transition world state",
+        "operationId": "updateWorldState",
+        "parameters": [{ "$ref": "#/components/parameters/WorldID" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StateRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated world",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldRecord" } } }
+          },
+          "404": { "description": "World not found" }
+        }
+      }
+    },
+    "/worlds/{world_id}/lease": {
+      "post": {
+        "tags": ["worlds"],
+        "summary": "Extend the world lease",
+        "operationId": "extendWorldLease",
+        "parameters": [{ "$ref": "#/components/parameters/WorldID" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExtendWorldLeaseRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated world",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldRecord" } } }
+          },
+          "404": { "description": "World not found" }
+        }
+      }
+    },
+    "/worlds/{world_id}/destroy": {
+      "post": {
+        "tags": ["worlds"],
+        "summary": "Destroy the world, recording residual-scan evidence",
+        "operationId": "destroyWorld",
+        "parameters": [{ "$ref": "#/components/parameters/WorldID" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DestroyWorldRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated world with cleanup evidence",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WorldRecord" } } }
+          },
+          "404": { "description": "World not found" }
+        }
+      }
+    },
+    "/experiments": {
+      "post": {
+        "tags": ["experiments"],
+        "summary": "Create an experiment (DRAFT)",
+        "operationId": "createExperiment",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateExperimentRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Created experiment",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExperimentRecord" } } }
+          },
+          "400": { "description": "Invalid experiment or unknown source binding" }
+        }
+      },
+      "get": {
+        "tags": ["experiments"],
+        "summary": "List experiments",
+        "operationId": "listExperiments",
+        "responses": {
+          "200": {
+            "description": "Experiment records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExperimentListResponse" } } }
+          }
+        }
+      }
+    },
+    "/experiments/{experiment_id}": {
+      "get": {
+        "tags": ["experiments"],
+        "summary": "Get an experiment",
+        "operationId": "getExperiment",
+        "parameters": [{ "$ref": "#/components/parameters/ExperimentID" }],
+        "responses": {
+          "200": {
+            "description": "Experiment record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExperimentRecord" } } }
+          },
+          "404": { "description": "Experiment not found" }
+        }
+      },
+      "delete": {
+        "tags": ["experiments"],
+        "summary": "Remove the experiment record",
+        "operationId": "deleteExperiment",
+        "parameters": [{ "$ref": "#/components/parameters/ExperimentID" }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "404": { "description": "Experiment not found" }
+        }
+      }
+    },
+    "/experiments/{experiment_id}/state": {
+      "patch": {
+        "tags": ["experiments"],
+        "summary": "Transition experiment state",
+        "operationId": "updateExperimentState",
+        "parameters": [{ "$ref": "#/components/parameters/ExperimentID" }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/StateRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated experiment",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ExperimentRecord" } } }
+          },
+          "404": { "description": "Experiment not found" }
+        }
+      }
+    },
+    "/source-bindings": {
+      "post": {
+        "tags": ["source-bindings"],
+        "summary": "Freeze an ExperimentSourceBinding from a catalog",
+        "operationId": "createSourceBinding",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateSourceBindingRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Frozen binding",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SourceBindingRecord" } } }
+          },
+          "400": { "description": "Unreadable catalog" }
+        }
+      },
+      "get": {
+        "tags": ["source-bindings"],
+        "summary": "List frozen bindings",
+        "operationId": "listSourceBindings",
+        "responses": {
+          "200": {
+            "description": "Binding records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SourceBindingListResponse" } } }
+          }
+        }
+      }
+    },
+    "/source-bindings/{binding_id}": {
+      "get": {
+        "tags": ["source-bindings"],
+        "summary": "Get a binding",
+        "operationId": "getSourceBinding",
+        "parameters": [{ "$ref": "#/components/parameters/BindingID" }],
+        "responses": {
+          "200": {
+            "description": "Binding record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/SourceBindingRecord" } } }
+          },
+          "404": { "description": "Binding not found" }
+        }
+      }
+    },
+    "/branches": {
+      "post": {
+        "tags": ["branches"],
+        "summary": "Register an immutable CounterfactualBranch record",
+        "operationId": "createBranch",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateBranchRequest" } } }
+        },
+        "responses": {
+          "201": {
+            "description": "Registered branch",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BranchRecord" } } }
+          },
+          "400": { "description": "Invalid branch" }
+        }
+      },
+      "get": {
+        "tags": ["branches"],
+        "summary": "List branches",
+        "operationId": "listBranches",
+        "responses": {
+          "200": {
+            "description": "Branch records",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BranchListResponse" } } }
+          }
+        }
+      }
+    },
+    "/branches/{branch_id}": {
+      "get": {
+        "tags": ["branches"],
+        "summary": "Get a branch",
+        "operationId": "getBranch",
+        "parameters": [{ "$ref": "#/components/parameters/BranchID" }],
+        "responses": {
+          "200": {
+            "description": "Branch record",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BranchRecord" } } }
+          },
+          "404": { "description": "Branch not found" }
+        }
+      }
+    },
+    "/audit-events": {
+      "get": {
+        "tags": ["audit"],
+        "summary": "List recent request audit facts",
+        "operationId": "listAuditEvents",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit events",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AuditEventListResponse" } } }
+          }
+        }
+      }
+    },
+    "/evidence": {
+      "get": {
+        "tags": ["evidence"],
+        "summary": "List content-addressed artifacts for an attempt",
+        "operationId": "listEvidence",
+        "parameters": [
+          { "$ref": "#/components/parameters/AttemptID" },
+          { "$ref": "#/components/parameters/ArtifactRoot" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Digests and kind/digest pairs",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/EvidenceListResponse" } } }
+          },
+          "400": { "description": "Missing attempt_id or artifact_root" }
+        }
+      }
+    },
+    "/evidence/{attempt_id}/{digest}": {
+      "get": {
+        "tags": ["evidence"],
+        "summary": "Retrieve stored evidence bytes",
+        "operationId": "getEvidence",
+        "parameters": [{ "$ref": "#/components/parameters/AttemptID" }, { "$ref": "#/components/parameters/Digest" }, { "$ref": "#/components/parameters/ArtifactRoot" }],
+        "responses": {
+          "200": {
+            "description": "Stored artifact bytes",
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "404": { "description": "Artifact not found" }
+        }
+      }
+    },
+    "/evidence/export": {
+      "get": {
+        "tags": ["evidence"],
+        "summary": "Download a deterministic tar evidence package with a self-describing manifest",
+        "operationId": "exportEvidence",
+        "parameters": [{ "$ref": "#/components/parameters/AttemptID" }, { "$ref": "#/components/parameters/ArtifactRoot" }],
+        "responses": {
+          "200": {
+            "description": "Evidence package archive. First entry is a manifest.json conforming to the EvidencePackage schema; package digest in Content-Digest header.",
+            "headers": {
+              "Content-Digest": { "schema": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } }
+            },
+            "content": { "application/octet-stream": { "schema": { "type": "string", "format": "binary" } } }
+          },
+          "404": { "description": "No evidence for the attempt" }
+        }
+      }
+    },
+    "/evidence/verify": {
+      "post": {
+        "tags": ["evidence"],
+        "summary": "Re-hash a stored artifact and report whether bytes match the declared digest",
+        "operationId": "verifyEvidence",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VerifyEvidenceRequest" } } }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification fact",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VerifyEvidenceResponse" } } }
+          },
+          "404": { "description": "Artifact not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "RunID": { "name": "run_id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "AttemptID": { "name": "attempt_id", "in": "query", "required": true, "schema": { "type": "string" } },
+      "WorldID": { "name": "world_id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "ExperimentID": { "name": "experiment_id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "BindingID": { "name": "binding_id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "BranchID": { "name": "branch_id", "in": "path", "required": true, "schema": { "type": "string" } },
+      "Digest": { "name": "digest", "in": "path", "required": true, "schema": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+      "ArtifactRoot": { "name": "artifact_root", "in": "query", "required": false, "schema": { "type": "string" } }
+    },
+    "schemas": {
+      "Health": {
+        "type": "object",
+        "required": ["status", "version", "store"],
+        "properties": {
+          "status": { "type": "string" },
+          "version": { "type": "string", "description": "Release version (dev for local builds)" },
+          "store": { "type": "string", "description": "Control-plane store backend (memory or postgres)" },
+          "tenant_id": { "type": "string" },
+          "quotas": { "type": "object", "additionalProperties": { "type": "integer" } }
+        }
+      },
+      "ProviderSandboxList": {
+        "type": "object",
+        "required": ["providers"],
+        "properties": {
+          "providers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "capabilities": { "type": "object" }
+              }
+            }
+          }
+        }
+      },
+      "SUTAdapterList": {
+        "type": "object",
+        "required": ["adapters"],
+        "properties": {
+          "adapters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "capabilities": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      },
+      "CompileScenarioRequest": {
+        "type": "object",
+        "required": ["schema_path", "source"],
+        "properties": {
+          "schema_path": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      },
+      "CompiledScenario": {
+        "type": "object",
+        "required": ["source_digest", "ir_digest", "ir"],
+        "properties": {
+          "source_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "ir_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "ir": { "type": "object" }
+        }
+      },
+      "ExpandCatalogRequest": {
+        "type": "object",
+        "required": ["catalog_path"],
+        "properties": { "catalog_path": { "type": "string" } }
+      },
+      "PlanSummary": {
+        "type": "object",
+        "required": ["scenario_id", "perturbation_id"],
+        "properties": {
+          "scenario_id": { "type": "string" },
+          "perturbation_id": { "type": "string" },
+          "control_id": { "type": "string" },
+          "seed": { "type": "integer" },
+          "label": { "type": "string" },
+          "namespace": { "type": "string" }
+        }
+      },
+      "ExpandCatalogResponse": {
+        "type": "object",
+        "required": ["catalog_id", "catalog_version", "plan_count", "plans"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "catalog_version": { "type": "string" },
+          "plan_count": { "type": "integer" },
+          "plans": { "type": "array", "items": { "$ref": "#/components/schemas/PlanSummary" } }
+        }
+      },
+      "ControlsAggregateRequest": {
+        "type": "object",
+        "required": ["catalog_path", "artifact_root"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "artifact_root": { "type": "string" }
+        }
+      },
+      "ControlAggregate": {
+        "type": "object",
+        "required": ["control_id", "adapter", "plan_count", "attempts", "with_evidence", "incomplete", "resource_reported"],
+        "properties": {
+          "control_id": { "type": "string" },
+          "adapter": { "type": "string" },
+          "options": { "type": "object", "additionalProperties": { "type": "string" } },
+          "plan_count": { "type": "integer" },
+          "attempts": { "type": "integer" },
+          "with_evidence": { "type": "integer" },
+          "incomplete": { "type": "integer" },
+          "mean_memory_bytes": { "type": "integer" },
+          "mean_cpu_millis": { "type": "integer" },
+          "resource_provider": { "type": "string" },
+          "resource_reported": { "type": "boolean" },
+          "variants": { "type": "array", "items": { "type": "string" } },
+          "scenarios": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["scenario_id", "attempts", "with_evidence", "incomplete"],
+              "properties": {
+                "scenario_id": { "type": "string" },
+                "attempts": { "type": "integer" },
+                "with_evidence": { "type": "integer" },
+                "incomplete": { "type": "integer" }
+              }
+            }
+          }
+        }
+      },
+      "ControlsAggregateResponse": {
+        "type": "object",
+        "required": ["catalog_id", "controls"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "artifact_root": { "type": "string", "description": "Artifact root whose recorded attempts were aggregated" },
+          "controls": { "type": "array", "items": { "$ref": "#/components/schemas/ControlAggregate" } }
+        }
+      },
+      "SuiteRunRequest": {
+        "type": "object",
+        "required": ["catalog_path", "schema_path", "scenario_id", "perturbation_id"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "schema_path": { "type": "string" },
+          "artifact_root": { "type": "string" },
+          "scenario_id": { "type": "string" },
+          "perturbation_id": { "type": "string" },
+          "control_id": { "type": "string", "description": "Control-axis variant; defaults to the catalog default" },
+          "seed": { "type": "integer", "description": "Reproducibility seed recorded in the evidence" },
+          "sandbox_provider": { "type": "string", "enum": ["synthetic", "host-telemetry", "container"], "description": "Isolation provider; host-telemetry reports measured process resource usage without a container" }
+        }
+      },
+      "MatrixRunRequest": {
+        "type": "object",
+        "required": ["catalog_path", "schema_path"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "schema_path": { "type": "string" },
+          "artifact_root": { "type": "string" },
+          "concurrency": { "type": "integer", "default": 1 },
+          "seed": { "type": "integer", "description": "Reproducibility seed recorded in the evidence" },
+          "sandbox_provider": { "type": "string", "enum": ["synthetic", "host-telemetry", "container"] }
+        }
+      },
+      "RetainedMatrixRunRequest": {
+        "type": "object",
+        "required": ["catalog_path", "schema_path", "repetitions"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "schema_path": { "type": "string" },
+          "artifact_root": { "type": "string" },
+          "concurrency": { "type": "integer", "default": 1 },
+          "repetitions": { "type": "integer", "minimum": 1 },
+          "max_retries": { "type": "integer", "default": 0 },
+          "seed": { "type": "integer", "description": "Reproducibility seed recorded in the evidence" },
+          "sandbox_provider": { "type": "string", "enum": ["synthetic", "host-telemetry", "container"] }
+        }
+      },
+      "BenchRunRequest": {
+        "type": "object",
+        "required": ["catalog_path", "schema_path", "repetitions"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "schema_path": { "type": "string" },
+          "artifact_root": { "type": "string" },
+          "concurrency": { "type": "integer", "default": 1 },
+          "repetitions": { "type": "integer", "minimum": 1 },
+          "max_retries": { "type": "integer", "default": 0 },
+          "seed": { "type": "integer", "description": "Reproducibility seed recorded in the evidence" },
+          "sandbox_provider": { "type": "string", "enum": ["synthetic", "host-telemetry", "container"] }
+        }
+      },
+      "ArtifactRef": {
+        "type": "object",
+        "required": ["kind", "ref", "digest"],
+        "properties": {
+          "kind": { "type": "string" },
+          "ref": { "type": "string" },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "CleanupEvidence": {
+        "type": "object",
+        "required": ["destroyed", "residual_scan_ref"],
+        "properties": {
+          "destroyed": { "type": "boolean" },
+          "residual_scan_ref": { "type": "string" }
+        }
+      },
+      "SuiteRunResponse": {
+        "type": "object",
+        "required": ["run_id", "state", "evidence", "cleanup"],
+        "properties": {
+          "run_id": { "type": "string" },
+          "state": { "type": "string" },
+          "evidence": { "$ref": "#/components/schemas/ArtifactRef" },
+          "cleanup": { "$ref": "#/components/schemas/ArtifactRef" },
+          "resource_usage": { "$ref": "#/components/schemas/ResourceUsage" }
+        }
+      },
+      "ResourceUsage": {
+        "type": "object",
+        "required": ["provider", "measured_at"],
+        "properties": {
+          "provider": { "type": "string" },
+          "cpu_millis": { "type": "integer" },
+          "memory_bytes": { "type": "integer" },
+          "measured_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RunResult": {
+        "type": "object",
+        "required": ["scenario_id", "perturbation_id", "attempt_id", "state"],
+        "properties": {
+          "scenario_id": { "type": "string" },
+          "perturbation_id": { "type": "string" },
+          "label": { "type": "string" },
+          "attempt_id": { "type": "string" },
+          "state": { "type": "string" },
+          "evidence_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "cleanup_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "error": { "type": "string" }
+        }
+      },
+      "RepetitionResult": {
+        "type": "object",
+        "required": ["scenario_id", "perturbation_id", "attempt_id", "state", "repetition", "started_at", "ended_at"],
+        "properties": {
+          "scenario_id": { "type": "string" },
+          "perturbation_id": { "type": "string" },
+          "label": { "type": "string" },
+          "attempt_id": { "type": "string" },
+          "state": { "type": "string" },
+          "evidence_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "cleanup_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "error": { "type": "string" },
+          "repetition": { "type": "integer" },
+          "parent_attempt_id": { "type": "string" },
+          "started_at": { "type": "string", "format": "date-time" },
+          "ended_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "MatrixRunResponse": {
+        "type": "object",
+        "required": ["catalog_id", "total", "completed", "failed", "results"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "total": { "type": "integer" },
+          "completed": { "type": "integer" },
+          "failed": { "type": "integer" },
+          "with_evidence": { "type": "integer" },
+          "with_cleanup": { "type": "integer" },
+          "results": { "type": "array", "items": { "$ref": "#/components/schemas/RunResult" } }
+        }
+      },
+      "RetainedMatrixRunResponse": {
+        "type": "object",
+        "required": ["catalog_id", "repetitions_requested", "total_attempts", "completed", "failed", "results"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "repetitions_requested": { "type": "integer" },
+          "total_attempts": { "type": "integer" },
+          "completed": { "type": "integer" },
+          "failed": { "type": "integer" },
+          "with_evidence": { "type": "integer" },
+          "with_cleanup": { "type": "integer" },
+          "results": { "type": "array", "items": { "$ref": "#/components/schemas/RepetitionResult" } }
+        }
+      },
+      "RebuiltManifest": {
+        "type": "object",
+        "required": ["attempt_id", "scenario_id", "perturbation_id", "label", "repetition", "state", "artifacts"],
+        "properties": {
+          "attempt_id": { "type": "string" },
+          "scenario_id": { "type": "string" },
+          "perturbation_id": { "type": "string" },
+          "label": { "type": "string" },
+          "repetition": { "type": "integer" },
+          "state": { "type": "string" },
+          "artifacts": { "type": "array", "items": { "$ref": "#/components/schemas/ArtifactRef" } },
+          "observations": { "type": "object", "additionalProperties": { "type": "string" } }
+        }
+      },
+      "BenchReport": {
+        "type": "object",
+        "required": ["catalog_id", "repetitions", "total_attempts", "completed", "failed", "rebuilt_manifests", "replay_verification", "completeness_check"],
+        "properties": {
+          "catalog_id": { "type": "string" },
+          "repetitions": { "type": "integer" },
+          "total_attempts": { "type": "integer" },
+          "completed": { "type": "integer" },
+          "failed": { "type": "integer" },
+          "with_evidence": { "type": "integer" },
+          "with_cleanup": { "type": "integer" },
+          "rebuilt_manifests": { "type": "array", "items": { "$ref": "#/components/schemas/RebuiltManifest" } },
+          "replay_verification": { "type": "string" },
+          "completeness_check": { "type": "string" },
+          "raw_results": { "type": "array", "items": { "$ref": "#/components/schemas/RepetitionResult" } }
+        }
+      },
+      "StateRequest": {
+        "type": "object",
+        "required": ["state"],
+        "properties": { "state": { "type": "string" } }
+      },
+      "CreateWorldRequest": {
+        "type": "object",
+        "required": ["world_id", "world_contract_digest", "lease_ttl_seconds"],
+        "properties": {
+          "world_id": { "type": "string" },
+          "version": { "type": "string" },
+          "provider": { "type": "string" },
+          "topology": { "type": "string" },
+          "world_contract_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "lease_ttl_seconds": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "WorldRecord": {
+        "type": "object",
+        "required": ["world_id", "version", "provider", "topology", "world_contract_digest", "state", "lease_expires_at", "created_at"],
+        "properties": {
+          "world_id": { "type": "string" },
+          "version": { "type": "string" },
+          "provider": { "type": "string" },
+          "topology": { "type": "string" },
+          "world_contract_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "state": { "type": "string" },
+          "lease_expires_at": { "type": "string", "format": "date-time" },
+          "cleanup": { "$ref": "#/components/schemas/CleanupEvidence" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "WorldListResponse": {
+        "type": "object",
+        "required": ["worlds"],
+        "properties": { "worlds": { "type": "array", "items": { "$ref": "#/components/schemas/WorldRecord" } } }
+      },
+      "ExtendWorldLeaseRequest": {
+        "type": "object",
+        "required": ["lease_expires_at"],
+        "properties": { "lease_expires_at": { "type": "string", "format": "date-time" } }
+      },
+      "DestroyWorldRequest": {
+        "type": "object",
+        "required": ["residual_scan_ref"],
+        "properties": { "residual_scan_ref": { "type": "string" } }
+      },
+      "CreateExperimentRequest": {
+        "type": "object",
+        "required": ["experiment_id"],
+        "properties": {
+          "experiment_id": { "type": "string" },
+          "version": { "type": "string" },
+          "source_binding_ref": { "type": "string" }
+        }
+      },
+      "ExperimentRecord": {
+        "type": "object",
+        "required": ["experiment_id", "version", "state", "created_at"],
+        "properties": {
+          "experiment_id": { "type": "string" },
+          "version": { "type": "string" },
+          "source_binding_ref": { "type": "string" },
+          "state": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ExperimentListResponse": {
+        "type": "object",
+        "required": ["experiments"],
+        "properties": { "experiments": { "type": "array", "items": { "$ref": "#/components/schemas/ExperimentRecord" } } }
+      },
+      "CreateSourceBindingRequest": {
+        "type": "object",
+        "required": ["catalog_path", "source_id", "source_kind", "source_revision", "mapping_version", "evidence_schema_digest"],
+        "properties": {
+          "catalog_path": { "type": "string" },
+          "source_id": { "type": "string" },
+          "source_kind": { "type": "string" },
+          "source_revision": { "type": "string" },
+          "mapping_version": { "type": "string" },
+          "evidence_schema_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "ExperimentSourceBinding": {
+        "type": "object",
+        "description": "Frozen source binding (schema-derived ExperimentSourceBinding v1)",
+        "additionalProperties": true
+      },
+      "SourceBindingRecord": {
+        "type": "object",
+        "required": ["binding_id", "binding"],
+        "properties": {
+          "binding_id": { "type": "string" },
+          "binding": { "$ref": "#/components/schemas/ExperimentSourceBinding" }
+        }
+      },
+      "SourceBindingListResponse": {
+        "type": "object",
+        "required": ["source_bindings"],
+        "properties": { "source_bindings": { "type": "array", "items": { "$ref": "#/components/schemas/SourceBindingRecord" } } }
+      },
+      "CreateBranchRequest": {
+        "type": "object",
+        "required": ["branch_id", "root_snapshot_digest", "mutation_digest", "snapshot_digest", "isolation_proof_ref"],
+        "properties": {
+          "branch_id": { "type": "string" },
+          "root_snapshot_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "mutation_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "namespace": { "type": "string", "default": "default" },
+          "isolation_proof_ref": { "type": "string" },
+          "cleanup_required": { "type": "boolean", "default": true },
+          "snapshot_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "BranchRecord": {
+        "type": "object",
+        "required": ["branch_id", "root_snapshot_digest", "mutation_digest", "namespace", "isolation_proof_ref", "cleanup_required", "snapshot_digest", "created_at"],
+        "properties": {
+          "branch_id": { "type": "string" },
+          "root_snapshot_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "mutation_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "namespace": { "type": "string" },
+          "isolation_proof_ref": { "type": "string" },
+          "cleanup_required": { "type": "boolean" },
+          "snapshot_digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "BranchListResponse": {
+        "type": "object",
+        "required": ["branches"],
+        "properties": { "branches": { "type": "array", "items": { "$ref": "#/components/schemas/BranchRecord" } } }
+      },
+      "AttemptRecord": {
+        "type": "object",
+        "required": ["run_id", "attempt_id", "state", "artifacts", "created_at"],
+        "properties": {
+          "run_id": { "type": "string" },
+          "attempt_id": { "type": "string" },
+          "replaces_attempt_id": { "type": "string" },
+          "state": { "type": "string" },
+          "artifacts": { "type": "array", "items": { "$ref": "#/components/schemas/ArtifactRef" } },
+          "cleanup": { "$ref": "#/components/schemas/CleanupEvidence" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "RunRecord": {
+        "type": "object",
+        "required": ["run_id", "state", "created_at", "attempts"],
+        "properties": {
+          "run_id": { "type": "string" },
+          "state": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "attempts": { "type": "array", "items": { "$ref": "#/components/schemas/AttemptRecord" } }
+        }
+      },
+      "RunListResponse": {
+        "type": "object",
+        "required": ["runs"],
+        "properties": { "runs": { "type": "array", "items": { "$ref": "#/components/schemas/RunRecord" } } }
+      },
+      "AuditEvent": {
+        "type": "object",
+        "required": ["timestamp", "actor", "tenant", "method", "path", "status", "duration_ms"],
+        "properties": {
+          "timestamp": { "type": "string", "format": "date-time" },
+          "actor": { "type": "string" },
+          "tenant": { "type": "string" },
+          "method": { "type": "string" },
+          "path": { "type": "string" },
+          "status": { "type": "integer" },
+          "duration_ms": { "type": "integer" },
+          "error": { "type": "string" }
+        }
+      },
+      "AuditEventListResponse": {
+        "type": "object",
+        "required": ["events"],
+        "properties": { "events": { "type": "array", "items": { "$ref": "#/components/schemas/AuditEvent" } } }
+      },
+      "EvidenceArtifact": {
+        "type": "object",
+        "required": ["kind", "digest"],
+        "properties": {
+          "kind": { "type": "string" },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "EvidenceListResponse": {
+        "type": "object",
+        "required": ["artifact_root", "attempt_id", "digests", "artifacts"],
+        "properties": {
+          "artifact_root": { "type": "string" },
+          "attempt_id": { "type": "string" },
+          "digests": { "type": "array", "items": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" } },
+          "artifacts": { "type": "array", "items": { "$ref": "#/components/schemas/EvidenceArtifact" } }
+        }
+      },
+      "VerifyEvidenceRequest": {
+        "type": "object",
+        "required": ["attempt_id", "digest"],
+        "properties": {
+          "attempt_id": { "type": "string" },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "artifact_root": { "type": "string" }
+        }
+      },
+      "VerifyEvidenceResponse": {
+        "type": "object",
+        "required": ["attempt_id", "digest", "verified"],
+        "properties": {
+          "attempt_id": { "type": "string" },
+          "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+          "verified": { "type": "boolean" }
+        }
+      },
+      "EvidencePackage": {
+        "type": "object",
+        "description": "Self-describing manifest carried as the first entry of an exported evidence package (matches contracts/schemas/evidence-package-v1.schema.json).",
+        "required": ["api_version", "kind", "manifest_version", "attempt_id", "created_at", "artifacts"],
+        "properties": {
+          "api_version": { "type": "string", "enum": ["peiravela/v1"] },
+          "kind": { "type": "string", "enum": ["EvidencePackage"] },
+          "manifest_version": { "type": "string", "enum": ["1.0.0"] },
+          "attempt_id": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["kind", "digest", "path"],
+              "properties": {
+                "kind": { "type": "string" },
+                "digest": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+                "path": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": { "error": { "type": "string" } }
+      }
+    }
+  }
+}

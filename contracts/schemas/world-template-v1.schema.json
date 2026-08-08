@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/world-template-v1.json",
+  "title": "PEIRAVELA WorldTemplate v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "id", "version", "provider", "topology", "resource_spec", "cleanup", "provenance"],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "WorldTemplate"},
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "provider": {"type": "string", "minLength": 1},
+    "topology": {"type": "string", "minLength": 1},
+    "resource_spec": {"type": "object", "minProperties": 1},
+    "network": {"type": "object"},
+    "cleanup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ttl_seconds", "residual_scan_required"],
+      "properties": {
+        "ttl_seconds": {"type": "integer", "minimum": 1},
+        "residual_scan_required": {"const": true}
+      }
+    },
+    "provenance": {"$ref": "#/$defs/provenance"}
+  },
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_label", "source_digest"],
+      "properties": {
+        "state_label": {"enum": ["observed", "replayed", "synthetic", "simulated", "predicted", "derived"]},
+        "source_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+      }
+    }
+  }
+}

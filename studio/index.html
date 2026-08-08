@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PEIRAVELA Studio</title>
+<style>
+  :root { --bg:#0f1117; --panel:#171a23; --line:#2a2f3d; --text:#e6e8ef; --muted:#8b93a7; --accent:#5b8def; --ok:#4fae6b; --err:#d96a6a; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.5 ui-monospace,"Cascadia Mono",Consolas,monospace; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 20px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  h1 { font-size:16px; margin:0; letter-spacing:.5px; }
+  h1 small { color:var(--accent); font-weight:400; margin-left:8px; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; }
+  .apibase { display:flex; gap:8px; align-items:center; }
+  label { color:var(--muted); font-size:12px; }
+  input, select, textarea, button { background:#0b0d12; color:var(--text); border:1px solid var(--line); border-radius:4px; padding:6px 8px; font:inherit; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); }
+  button { cursor:pointer; background:#1b2029; }
+  button:hover { border-color:var(--accent); }
+  button.primary { background:#23344f; border-color:var(--accent); }
+  nav { display:flex; gap:4px; padding:10px 20px; border-bottom:1px solid var(--line); overflow-x:auto; flex-shrink:0; }
+  nav button { border-color:transparent; color:var(--muted); white-space:nowrap; }
+  nav button.active { border-color:var(--accent); color:var(--text); }
+  main { padding:20px; max-width:1280px; width:100%; margin:0 auto; overflow:auto; }
+  .panel { display:none; }
+  .panel.active { display:block; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:0 0 12px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:16px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px; }
+  .card h3 { font-size:12px; margin:0 0 10px; color:var(--accent); text-transform:uppercase; letter-spacing:.5px; }
+  .field { display:flex; flex-direction:column; gap:4px; margin-bottom:10px; }
+  .row { display:flex; gap:8px; flex-wrap:wrap; align-items:end; }
+  .pre { background:#0b0d12; border:1px solid var(--line); border-radius:4px; padding:10px; overflow:auto; max-height:420px; margin-top:10px; font-size:12px; }
+  .muted { color:var(--muted); }
+  .ok { color:var(--ok); }
+  .err { color:var(--err); }
+  table { border-collapse:collapse; width:100%; font-size:13px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:400; white-space:nowrap; }
+  tr.clickable:hover td { background:#1b2230; }
+  a { color:var(--accent); cursor:pointer; }
+  ul { margin:0; padding-left:18px; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:11px; background:#223048; color:var(--accent); margin-right:4px; }
+  .state { font-weight:600; }
+  .spacer { height:10px; }
+  .msg { margin-top:8px; min-height:18px; font-size:12px; }
+  textarea { width:100%; resize:vertical; }
+  .summary { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px; }
+  .stat { background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:10px 14px; min-width:110px; }
+  .stat b { display:block; font-size:20px; }
+  .stat span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.5px; }
+  .timeline { border-left:2px solid var(--line); margin:8px 0; padding-left:14px; }
+  .tl-item { position:relative; padding:8px 0 14px; }
+  .tl-item::before { content:""; position:absolute; left:-19px; top:16px; width:8px; height:8px; border-radius:50%; background:var(--accent); }
+  .tl-item.failed::before { background:var(--err); }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PEIRAVELA Studio <small>control plane</small></h1>
+  <div class="apibase">
+    <label for="api-base">API base</label>
+    <input id="api-base" placeholder="/" value="">
+    <input type="password" id="api-key" placeholder="Bearer token / API key (optional)">
+    <button id="reload">Reload</button>
+  </div>
+</header>
+<nav id="nav">
+  <button data-panel="overview" class="active">Overview</button>
+  <button data-panel="catalog">Catalog</button>
+  <button data-panel="bindings">Source Bindings</button>
+  <button data-panel="worlds">Worlds</button>
+  <button data-panel="experiments">Experiments</button>
+  <button data-panel="runs">Runs</button>
+  <button data-panel="controls">Controls</button>
+  <button data-panel="branches">Branches</button>
+  <button data-panel="console">Run Console</button>
+  <button data-panel="evidence">Evidence</button>
+  <button data-panel="audit">Audit</button>
+  <button data-panel="compile">Scenario Compile</button>
+</nav>
+<main>
+  <section id="panel-overview" class="panel active">
+    <h2>Overview</h2>
+    <div class="card"><div id="health"><p class="muted">loading…</p></div></div>
+    <div class="spacer"></div>
+    <div class="grid">
+      <div class="card"><h3>Sandbox Providers</h3><div id="sandboxes"><p class="muted">loading…</p></div></div>
+      <div class="card"><h3>SUT Adapters</h3><div id="adapters"><p class="muted">loading…</p></div></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="card"><h3>Evidence activity</h3><div id="evidence-activity"><p class="muted">loading…</p></div></div>
+    <div class="spacer"></div>
+    <div class="card"><h3>Recent activity (audit, last 100)</h3><div id="activity"><p class="muted">loading…</p></div></div>
+  </section>
+
+  <section id="panel-catalog" class="panel">
+    <h2>Catalog &amp; Matrix Preview</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Expand a suite catalog</h3>
+        <form id="form-catalog">
+          <div class="field"><label>catalog_path</label><input name="catalog_path" required></div>
+          <button type="submit" class="primary">Preview plans</button>
+        </form>
+        <div id="catalog-msg" class="msg"></div>
+      </div>
+      <div class="card"><h3>Expanded plans</h3><div id="catalog-out"><p class="muted">enter a catalog path to preview its plans</p></div></div>
+    </div>
+  </section>
+
+  <section id="panel-bindings" class="panel">
+    <h2>Source Bindings</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Freeze a binding</h3>
+        <form id="form-binding">
+          <div class="field"><label>catalog_path</label><input name="catalog_path" required></div>
+          <div class="field"><label>source_id</label><input name="source_id" value="axisrobo"></div>
+          <div class="field"><label>source_kind</label><input name="source_kind" value="loimos3"></div>
+          <div class="field"><label>source_revision</label><input name="source_revision" value="v1"></div>
+          <div class="field"><label>mapping_version</label><input name="mapping_version" value="1.0.0"></div>
+          <div class="field"><label>evidence_schema_digest (sha256)</label><input name="evidence_schema_digest" required></div>
+          <button type="submit" class="primary">Freeze</button>
+          <div id="binding-msg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card"><h3>Frozen bindings</h3>
+        <div class="field"><label>filter</label><input id="binding-filter" placeholder="filter id / source / status"></div>
+        <div id="binding-list"><p class="muted">empty</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-worlds" class="panel">
+    <h2>Worlds</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Create a world</h3>
+        <form id="form-world">
+          <div class="field"><label>world_id</label><input name="world_id" required></div>
+          <div class="field"><label>world_contract_digest (sha256)</label><input name="world_contract_digest" required></div>
+          <div class="row">
+            <div class="field"><label>lease_ttl_seconds</label><input name="lease_ttl_seconds" type="number" value="3600"></div>
+            <div class="field"><label>provider</label><input name="provider" value="synthetic"></div>
+            <div class="field"><label>topology</label><input name="topology" value="single-node"></div>
+          </div>
+          <button type="submit" class="primary">Create</button>
+          <div id="world-msg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card"><h3>Worlds</h3><div id="world-list"><p class="muted">empty</p></div></div>
+    </div>
+  </section>
+
+  <section id="panel-experiments" class="panel">
+    <h2>Experiments</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Create an experiment</h3>
+        <form id="form-experiment">
+          <div class="field"><label>experiment_id</label><input name="experiment_id" required></div>
+          <div class="field"><label>version</label><input name="version" value="0.1.0"></div>
+          <div class="field"><label>source_binding_ref (optional)</label><input name="source_binding_ref"></div>
+          <button type="submit" class="primary">Create</button>
+          <div id="experiment-msg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card"><h3>Experiments</h3>
+        <div class="field"><label>filter</label><input id="experiment-filter" placeholder="filter id / state / binding"></div>
+        <div id="experiment-list"><p class="muted">empty</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-runs" class="panel">
+    <h2>Runs &amp; Attempts</h2>
+    <div class="card">
+      <div class="field"><label>filter</label><input id="run-filter" placeholder="filter run_id / state"></div>
+      <div id="run-list"><p class="muted">loading…</p></div>
+      <div id="run-detail"></div>
+    </div>
+  </section>
+
+  <section id="panel-controls" class="panel">
+    <h2>Control Variant Comparison</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Aggregate recorded attempts by control</h3>
+        <form id="form-controls">
+          <div class="field"><label>catalog_path</label><input name="catalog_path" required></div>
+          <div class="field"><label>artifact_root</label><input name="artifact_root" required></div>
+          <button type="submit" class="primary">Aggregate</button>
+          <div id="controls-msg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card"><h3>Per-control facts</h3><div id="controls-out"><p class="muted">enter a catalog path and artifact root to compare its control variants</p></div></div>
+    </div>
+  </section>
+
+  <section id="panel-branches" class="panel">
+    <h2>Branches</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Register a branch</h3>
+        <form id="form-branch">
+          <div class="field"><label>branch_id</label><input name="branch_id" required></div>
+          <div class="field"><label>root_snapshot_digest (sha256)</label><input name="root_snapshot_digest" required></div>
+          <div class="field"><label>mutation_digest (sha256)</label><input name="mutation_digest" required></div>
+          <div class="field"><label>snapshot_digest (sha256)</label><input name="snapshot_digest" required></div>
+          <div class="field"><label>isolation_proof_ref</label><input name="isolation_proof_ref" required></div>
+          <div class="row">
+            <div class="field"><label>namespace</label><input name="namespace" value="default"></div>
+          </div>
+          <button type="submit" class="primary">Register</button>
+          <div id="branch-msg" class="msg"></div>
+        </form>
+      </div>
+      <div class="card"><h3>Branches</h3>
+        <div class="field"><label>filter</label><input id="branch-filter" placeholder="filter id / namespace / isolation proof"></div>
+        <div id="branch-list"><p class="muted">empty</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-console" class="panel">
+    <h2>Run Console</h2>
+    <div class="card">
+      <form id="form-console">
+        <div class="field"><label>operation</label>
+          <select name="operation">
+            <option value="suite">Suite run (one scenario × perturbation)</option>
+            <option value="matrix">Matrix run (all plans)</option>
+            <option value="retained-matrix">Retained matrix (repetitions)</option>
+            <option value="bench">PEIRA-Bench (retained + completeness)</option>
+          </select>
+        </div>
+        <div class="field"><label>catalog_path</label><input name="catalog_path" required></div>
+        <div class="field"><label>schema_path</label><input name="schema_path" required></div>
+        <div class="field"><label>artifact_root</label><input name="artifact_root" required></div>
+        <div class="row" id="console-suite-fields">
+          <div class="field"><label>scenario_id</label><input name="scenario_id" value="s01"></div>
+          <div class="field"><label>perturbation_id</label><input name="perturbation_id" value="benign-control"></div>
+        </div>
+        <div class="row" id="console-run-fields">
+          <div class="field"><label>concurrency</label><input name="concurrency" type="number" value="1"></div>
+          <div class="field"><label>repetitions</label><input name="repetitions" type="number" value="2"></div>
+          <div class="field"><label>max_retries</label><input name="max_retries" type="number" value="0"></div>
+          <div class="field"><label>sandbox_provider</label>
+            <select name="sandbox_provider">
+              <option value="synthetic">synthetic</option>
+              <option value="host-telemetry">host-telemetry</option>
+              <option value="container">container</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="primary">Execute</button>
+        <div id="console-msg" class="msg"></div>
+      </form>
+      <div id="console-out" class="pre"></div>
+    </div>
+  </section>
+
+  <section id="panel-evidence" class="panel">
+    <h2>Evidence Explorer</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>List attempt evidence</h3>
+        <form id="form-evidence">
+          <div class="field"><label>attempt_id</label><input name="attempt_id" required></div>
+          <div class="field"><label>artifact_root (optional)</label><input name="artifact_root"></div>
+          <div class="row">
+            <button type="submit" class="primary">List</button>
+            <button type="button" id="export-package">Export package</button>
+          </div>
+        </form>
+        <div id="evidence-msg" class="msg"></div>
+        <div class="row">
+          <div class="field"><label>filter kind</label><select id="evidence-kind"><option value="">all kinds</option></select></div>
+          <div class="field"><label>filter digest prefix</label><input id="evidence-filter" placeholder="sha256 prefix"></div>
+        </div>
+        <div class="row"><button type="button" id="verify-all">Verify shown</button></div>
+        <div id="evidence-list"><p class="muted">enter an attempt_id to list its content-addressed digests</p></div>
+      </div>
+      <div class="card">
+        <h3>View evidence</h3>
+        <form id="form-evidence-get">
+          <div class="field"><label>attempt_id</label><input name="attempt_id" required></div>
+          <div class="field"><label>digest</label><input name="digest" placeholder="sha256:..." required></div>
+          <div class="field"><label>artifact_root (optional)</label><input name="artifact_root"></div>
+        <button type="submit" class="primary">Fetch</button>
+        <div id="evidence-get-msg" class="msg"></div>
+        <div id="evidence-get-out" class="pre"></div>
+      </div>
+      <div class="card">
+        <h3>Verify evidence integrity</h3>
+        <form id="form-evidence-verify">
+          <div class="field"><label>attempt_id</label><input name="attempt_id" required></div>
+          <div class="field"><label>digest</label><input name="digest" placeholder="sha256:..." required></div>
+          <div class="field"><label>artifact_root (optional)</label><input name="artifact_root"></div>
+          <button type="submit" class="primary">Verify</button>
+        </form>
+        <div id="evidence-verify-msg" class="msg"></div>
+        <div id="evidence-verify-out" class="pre"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-compile" class="panel">
+    <h2>Scenario Compile</h2>
+    <div class="card">
+      <form id="form-compile">
+        <div class="field"><label>schema_path</label><input name="schema_path" required></div>
+        <div class="field"><label>source (scenario JSON)</label><textarea name="source" rows="10" required></textarea></div>
+        <button type="submit" class="primary">Compile</button>
+        <div id="compile-msg" class="msg"></div>
+        <div id="compile-out" class="pre"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="panel-audit" class="panel">
+    <h2>Audit Events</h2>
+    <div class="card">
+      <div class="row">
+        <div class="field"><label>filter</label><input id="audit-filter" placeholder="filter path / method / actor"></div>
+        <div class="field"><label>limit</label><input id="audit-limit" type="number" value="100" style="width:90px"></div>
+      </div>
+      <div id="audit-list"><p class="muted">loading…</p></div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import PeiravelaClient from "./peiravela.js";
+
+const apiBaseInput = document.getElementById("api-base");
+const apiKeyInput = document.getElementById("api-key");
+
+function client() {
+  const c = new PeiravelaClient(apiBaseInput.value.trim() || "", {});
+  return c;
+}
+function authHeaders() {
+  const key = apiKeyInput.value.trim();
+  if (!key) return {};
+  return key.startsWith("Bearer ") ? { Authorization: key } : { "X-PEIRAVELA-API-Key": key };
+}
+
+async function api(path, opts) {
+  const c = client();
+  const res = await fetch(c.baseURL + path, Object.assign({ headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()) }, opts));
+  const text = await res.text();
+  let parsed;
+  try { parsed = JSON.parse(text); } catch { parsed = text; }
+  if (!res.ok) { const e = new Error((parsed && parsed.error) || res.status + " " + res.statusText); e.status = res.status; throw e; }
+  return parsed;
+}
+
+function $(id) { return document.getElementById(id); }
+function out(id, html) { $(id).innerHTML = html; }
+let experimentsCache = [];
+let branchesCache = [];
+let runsCache = [];
+let bindingsCache = [];
+let worldsCache = [];
+let evidenceState = null;
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c])); }
+function pre(json) { return '<div class="pre">' + esc(JSON.stringify(json, null, 2)) + "</div>"; }
+function chips(items) { return items && items.length ? '<ul>' + items.map(i => "<li>" + esc(i) + "</li>").join("") + "</ul>" : '<span class="muted">none</span>'; }
+function stateBadge(s) { return '<span class="state">' + esc(s) + "</span>"; }
+function payload(form) {
+  const data = Object.fromEntries(new FormData(form));
+  for (const k of Object.keys(data)) {
+    if (["concurrency","repetitions","max_retries","lease_ttl_seconds"].includes(k)) data[k] = parseInt(data[k], 10) || 0;
+  }
+  return data;
+}
+function msg(id, text, cls) { out(id, '<span class="' + (cls || "ok") + '">' + esc(text) + "</span>"); }
+function fail(id, err) { out(id, '<span class="err">' + esc(err.message || err) + "</span>"); }
+async function run(fn) {
+  try { await fn(); } catch (err) { alert(err.message + (err.status ? " (" + err.status + ")" : "")); }
+}
+
+$("nav").addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-panel]");
+  if (!btn) return;
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  $("panel-" + btn.dataset.panel).classList.add("active");
+  const loaders = panelLoaders();
+  if (loaders[btn.dataset.panel]) run(loaders[btn.dataset.panel]);
+});
+function panelLoaders() {
+  return {
+    overview: loadOverview,
+    runs: loadRuns,
+    audit: loadAudit,
+    worlds: loadWorlds,
+    experiments: loadExperiments,
+    branches: loadBranches,
+    bindings: loadBindings
+  };
+}
+$("reload").addEventListener("click", () => {
+  const active = document.querySelector("nav button.active").dataset.panel;
+  const loaders = panelLoaders();
+  if (loaders[active]) run(loaders[active]);
+});
+
+async function loadOverview() {
+  const [sb, ad, health, audit, runs] = await Promise.all([
+    api("/provider-sandboxes"),
+    api("/sut-adapters"),
+    api("/health"),
+    api("/audit-events?limit=100"),
+    api("/runs")
+  ]);
+  out("health", '<strong>' + (health.status === "ok" ? '<span class="ok">healthy</span>' : '<span class="err">' + esc(health.status) + "</span>") + "</strong>" +
+    '<div class="muted">store: ' + esc(health.store || "unknown") + (health.tenant_id ? " · tenant: " + esc(health.tenant_id) : "") + "</div>" +
+    (health.quotas && Object.keys(health.quotas).length ? "<div class='muted'>quotas: " + esc(Object.entries(health.quotas).map(function (kv) { return kv[0] + "=" + kv[1]; }).join(", ")) + "</div>" : ""));
+  out("sandboxes", sb.providers.map(p =>
+    "<div><strong>" + esc(p.name) + "</strong><div class='muted'>traits: " + esc((p.capabilities && p.capabilities.traits || []).join(", ") || "none") + "</div></div><div class='spacer'></div>").join(""));
+  out("adapters", ad.adapters.map(a =>
+    "<div><strong>" + esc(a.id) + "</strong><div class='muted'>" + chips(a.capabilities || []) + "</div></div><div class='spacer'></div>").join(""));
+  const attempts = (runs.runs || []).reduce((acc, run) => acc.concat(run.attempts || []), []);
+  const withEvidence = attempts.filter(a => (a.artifacts || []).some(ar => ar.kind === "evidence")).length;
+  const withCleanup = attempts.filter(a => (a.artifacts || []).some(ar => ar.kind === "cleanup")).length;
+  out("evidence-activity", '<div class="summary">' +
+    '<div class="stat"><b>' + (runs.runs || []).length + '</b><span>runs</span></div>' +
+    '<div class="stat"><b>' + attempts.length + '</b><span>attempts</span></div>' +
+    '<div class="stat"><b class="ok">' + withEvidence + '</b><span>with evidence</span></div>' +
+    '<div class="stat"><b class="ok">' + withCleanup + '</b><span>with cleanup</span></div></div>');
+  const events = audit.events || [];
+  const errors = events.filter(ev => ev.status >= 400).length;
+  out("activity", '<div class="summary">' +
+    '<div class="stat"><b>' + events.length + '</b><span>requests</span></div>' +
+    '<div class="stat"><b' + (errors ? " class='err'" : " class='ok'") + '>' + errors + '</b><span>errors (4xx/5xx)</span></div></div>' +
+    '<table><tr><th>time</th><th>method</th><th>path</th><th>status</th></tr>' +
+    events.slice(0, 10).map(ev => "<tr><td class='muted'>" + esc(ev.timestamp) + "</td><td>" + esc(ev.method) + "</td><td>" + esc(ev.path) + "</td><td" + (ev.status >= 400 ? " class='err'" : "") + ">" + ev.status + "</td></tr>").join("") + "</table>");
+}
+
+// Catalog / matrix preview
+$("form-catalog").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const body = await api("/catalogs/expand", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("catalog-msg", body.catalog_id + " v" + body.catalog_version + " · " + body.plan_count + " plans");
+    const rows = body.plans.map(p => "<tr><td>" + esc(p.scenario_id) + "</td><td>" + esc(p.perturbation_id) + "</td><td>" + esc(p.control_id || "default") + "</td><td>" + (p.seed !== undefined ? p.seed : 0) + "</td><td>" + esc(p.label) + "</td><td class='muted'>" + esc(p.namespace) + "</td></tr>").join("");
+    out("catalog-out", '<table><tr><th>scenario</th><th>perturbation</th><th>control</th><th>seed</th><th>label</th><th>namespace</th></tr>' + rows + "</table>");
+  });
+});
+
+// Control variant comparison (aggregate recorded attempts per control)
+$("form-controls").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const body = await api("/controls/aggregate", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("controls-msg", body.catalog_id + " · " + body.controls.length + " control variants");
+    const rows = body.controls.map(c => {
+      const opts = Object.entries(c.options || {}).map(kv => esc(kv[0] + "=" + kv[1])).join(" · ") || '<span class="muted">-</span>';
+      const usage = c.resource_reported
+        ? esc(c.resource_provider || "provider") + (c.mean_memory_bytes > 0 ? " · " + Math.round(c.mean_memory_bytes / 1024 / 1024) + "MB mem" : "") + (c.mean_cpu_millis > 0 ? " · " + c.mean_cpu_millis + "ms cpu" : "")
+        : '<span class="muted">unreported</span>';
+      const scenarioCells = (c.scenarios || []).map(sc =>
+        "<tr><td class='muted'></td><td>" + esc(sc.scenario_id) + "</td><td>" + sc.attempts + "</td><td class='ok'>" + sc.with_evidence + "</td><td" + (sc.incomplete ? " class='err'" : "") + ">" + sc.incomplete + "</td><td class='muted'></td><td class='muted'></td></tr>").join("");
+      return "<tr><td>" + esc(c.control_id) + "</td><td>" + esc(c.adapter) + "</td><td>" + opts + "</td><td>" + c.plan_count + "</td><td>" + c.attempts + "</td><td class='ok'>" + c.with_evidence + "</td><td" + (c.incomplete ? " class='err'" : "") + ">" + c.incomplete + "</td><td class='muted'>" + usage + "</td><td>" + (c.variants || []).map(v => "<span class='badge'>" + esc(v) + "</span>").join(" ") + "</td></tr>" + scenarioCells;
+    }).join("");
+    out("controls-out", '<table><tr><th>control_id</th><th>adapter</th><th>options</th><th>plan cells</th><th>attempts</th><th>with evidence</th><th>incomplete</th><th>resource usage</th><th>variants</th></tr>' + rows + "<tr><td colspan='9' class='muted'>per-scenario rows are indented below their control (scenario × attempts × evidence)</td></tr></table>");
+  });
+});
+
+// Source bindings
+$("form-binding").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const created = await api("/source-bindings", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("binding-msg", "frozen " + esc(created.binding_id));
+    e.target.reset();
+    await loadBindings();
+  });
+});
+async function loadBindings() {
+  const { source_bindings } = await api("/source-bindings");
+  bindingsCache = source_bindings;
+  renderBindings();
+}
+function renderBindings() {
+  const q = ($("binding-filter").value || "").trim().toLowerCase();
+  const filtered = bindingsCache.filter(b => !q || (b.binding_id + " " + (b.binding.source_kind || "") + " " + (b.binding.status || "")).toLowerCase().includes(q));
+  if (!filtered.length) { out("binding-list", '<p class="muted">no matching bindings</p>'); return; }
+  out("binding-list", '<table><tr><th>binding_id</th><th>source</th><th>track</th><th>status</th></tr>' +
+    filtered.map(b => "<tr class='clickable' data-binding='" + esc(b.binding_id) + "'><td>" + esc(b.binding_id) + "</td><td>" + esc(b.binding.source_kind) + "</td><td>" + esc((b.binding.tracks || []).map(t => t.track_id).join(", ")) + "</td><td>" + esc(b.binding.status) + "</td></tr>" +
+      "<tr class='hidden' id='binding-detail-" + esc(b.binding_id) + "'><td colspan='4'>" + pre(b) + "</td></tr>").join("") + "</table>");
+  document.querySelectorAll("tr[data-binding]").forEach(tr => tr.addEventListener("click", () => {
+    const row = $("binding-detail-" + tr.dataset.binding);
+    const wasHidden = row.classList.contains("hidden");
+    document.querySelectorAll("[id^='binding-detail-']").forEach(r => r.classList.add("hidden"));
+    if (wasHidden) row.classList.remove("hidden");
+  }));
+}
+$("binding-filter").addEventListener("input", renderBindings);
+
+// Worlds
+$("form-world").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const created = await api("/worlds", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("world-msg", "created " + esc(created.world_id) + " [" + stateBadge(created.state) + "] · lease → " + esc(created.lease_expires_at));
+    e.target.reset();
+    await loadWorlds();
+  });
+});
+async function loadWorlds() {
+  const { worlds } = await api("/worlds");
+  worldsCache = worlds;
+  if (!worlds.length) { out("world-list", '<p class="muted">empty</p>'); return; }
+  out("world-list", '<table><tr><th>world_id</th><th>state</th><th>lease_expires_at</th><th>actions</th></tr>' +
+    worlds.map(w => {
+      const leaseNote = leaseRemaining(w.lease_expires_at);
+      const leaseCls = leaseNote.includes("expired") ? " class='err'" : " class='muted'";
+      return "<tr><td>" + esc(w.world_id) + "</td><td>" + stateBadge(w.state) + "</td><td" + leaseCls + ">" + esc(w.lease_expires_at) + " <span class='muted'>" + esc(leaseNote) + "</span></td><td>" +
+        "<a data-world='" + esc(w.world_id) + "' data-action='state'>launch</a> · " +
+        "<a data-world='" + esc(w.world_id) + "' data-action='lease'>extend</a> · " +
+        "<a data-world='" + esc(w.world_id) + "' data-action='destroy'>destroy</a> · " +
+        "<a data-world='" + esc(w.world_id) + "' data-action='delete'>delete</a></td></tr>";
+    }).join("") + "</table>");
+  document.querySelectorAll("a[data-world]").forEach(a => a.addEventListener("click", () => run(() => worldAction(a.dataset.world, a.dataset.action))));
+}
+// leaseRemaining returns a short human note about the world lease's remaining
+// time, or "expired" when the lease has elapsed.
+function leaseRemaining(expiresAt) {
+  const remaining = new Date(expiresAt).getTime() - Date.now();
+  if (isNaN(remaining)) return "";
+  if (remaining <= 0) return "expired";
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  if (days > 0) return days + "d " + hours + "h left";
+  if (hours > 0) return hours + "h " + minutes + "m left";
+  return minutes + "m left";
+}
+async function worldAction(worldID, action) {
+  if (action === "state") {
+    const current = (worldsCache.find(w => w.world_id === worldID) || {}).state || "";
+    const legal = nextStates("world", current);
+    const suggested = legal.length ? legal[0] : (current || "READY");
+    const state = prompt("Set world state for " + worldID + (legal.length ? " (legal: " + legal.join(", ") + ")" : " (terminal)"), suggested);
+    if (state == null) return;
+    await api("/worlds/" + encodeURIComponent(worldID) + "/state", { method: "PATCH", body: JSON.stringify({ state }) });
+  } else if (action === "lease") {
+    const hours = prompt("Extend lease (hours) for " + worldID, "24");
+    if (hours == null) return;
+    const lease_expires_at = new Date(Date.now() + (parseFloat(hours) || 24) * 3600 * 1000).toISOString();
+    await api("/worlds/" + encodeURIComponent(worldID) + "/lease", { method: "POST", body: JSON.stringify({ lease_expires_at }) });
+  } else if (action === "destroy") {
+    const residual_scan_ref = prompt("Residual scan ref (required) for " + worldID, "artifact://residual-scan.json");
+    if (residual_scan_ref == null) return;
+    await api("/worlds/" + encodeURIComponent(worldID) + "/destroy", { method: "POST", body: JSON.stringify({ residual_scan_ref }) });
+  } else {
+    await api("/worlds/" + encodeURIComponent(worldID), { method: "DELETE" });
+  }
+  await loadWorlds();
+}
+
+// Branches
+$("form-branch").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const created = await api("/branches", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("branch-msg", "registered " + esc(created.branch_id) + " [" + stateBadge(created.namespace) + "] · cleanup " + (created.cleanup_required ? "required" : "optional"));
+    e.target.reset();
+    await loadBranches();
+  });
+});
+async function loadBranches() {
+  const { branches } = await api("/branches");
+  branchesCache = branches;
+  renderBranches();
+}
+function renderBranches() {
+  const q = ($("branch-filter").value || "").trim().toLowerCase();
+  const filtered = branchesCache.filter(b => !q || (b.branch_id + " " + b.namespace + " " + (b.isolation_proof_ref || "")).toLowerCase().includes(q));
+  if (!filtered.length) { out("branch-list", '<p class="muted">no matching branches</p>'); return; }
+  out("branch-list", '<table><tr><th>branch_id</th><th>namespace</th><th>root_snapshot</th><th>mutation</th><th>isolation</th></tr>' +
+    filtered.map(b => "<tr class='clickable' data-branch='" + esc(b.branch_id) + "'><td>" + esc(b.branch_id) + "</td><td>" + esc(b.namespace) + "</td><td>" + esc(b.root_snapshot_digest.slice(0, 12)) + "</td><td>" + esc(b.mutation_digest.slice(0, 12)) + "</td><td>" + esc(b.isolation_proof_ref) + "</td></tr>" +
+      "<tr class='hidden' id='branch-detail-" + esc(b.branch_id) + "'><td colspan='5'>" + pre(b) + "</td></tr>").join("") + "</table>");
+  document.querySelectorAll("tr[data-branch]").forEach(tr => tr.addEventListener("click", () => {
+    const row = $("branch-detail-" + tr.dataset.branch);
+    const wasHidden = row.classList.contains("hidden");
+    document.querySelectorAll("[id^='branch-detail-']").forEach(r => r.classList.add("hidden"));
+    if (wasHidden) row.classList.remove("hidden");
+  }));
+}
+$("branch-filter").addEventListener("input", renderBranches);
+
+// Experiments
+$("form-experiment").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const created = await api("/experiments", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("experiment-msg", "created " + esc(created.experiment_id) + " [" + stateBadge(created.state) + "]");
+    e.target.reset();
+    await loadExperiments();
+  });
+});
+async function loadExperiments() {
+  const { experiments } = await api("/experiments");
+  experimentsCache = experiments;
+  renderExperiments();
+}
+function renderExperiments() {
+  const q = ($("experiment-filter").value || "").trim().toLowerCase();
+  const filtered = experimentsCache.filter(x => !q || (x.experiment_id + " " + x.state + " " + (x.source_binding_ref || "")).toLowerCase().includes(q));
+  if (!filtered.length) { out("experiment-list", '<p class="muted">no matching experiments</p>'); return; }
+  out("experiment-list", '<table><tr><th>experiment_id</th><th>state</th><th>source_binding_ref</th><th>created_at</th></tr>' +
+    filtered.map(x => "<tr class='clickable' data-exp='" + esc(x.experiment_id) + "'><td>" + esc(x.experiment_id) + "</td><td>" + stateBadge(x.state) + "</td><td class='muted'>" + esc(x.source_binding_ref || "-") + "</td><td class='muted'>" + esc(x.created_at) + "</td></tr>" +
+      "<tr class='hidden' id='exp-detail-" + esc(x.experiment_id) + "'><td colspan='4'>" + experimentDetail(x) + "</td></tr>").join("") + "</table>");
+  document.querySelectorAll("tr[data-exp]").forEach(tr => tr.addEventListener("click", () => {
+    const row = $("exp-detail-" + tr.dataset.exp);
+    const wasHidden = row.classList.contains("hidden");
+    document.querySelectorAll("[id^='exp-detail-']").forEach(r => r.classList.add("hidden"));
+    if (wasHidden) row.classList.remove("hidden");
+  }));
+  wireExperimentActions();
+}
+// State machines. nextStates(kind, state) returns the legal successor states
+// for a resource so the Studio only offers valid transitions.
+// Suggested legal transition DAG per resource. The select offers the current
+// state plus the legal successors the control-plane API accepts; the hint
+// labels the same path.
+const STATE_MACHINES = {
+  experiment: {
+    DRAFT: ["VALIDATED", "CANCELLED"],
+    VALIDATED: ["QUEUED", "CANCELLED"],
+    QUEUED: ["PROVISIONING", "CANCELLED"],
+    PROVISIONING: ["READY", "FAILED", "CANCELLED"],
+    READY: ["RUNNING", "CANCELLED"],
+    RUNNING: ["COLLECTING", "FAILED", "CANCELLED"],
+    COLLECTING: ["FINALIZING", "FAILED", "CANCELLED"],
+    FINALIZING: ["COMPLETED", "FAILED", "CANCELLED"],
+    COMPLETED: [],
+    FAILED: [],
+    CANCELLED: []
+  },
+  run: {
+    RUNNING: ["COMPLETED", "FAILED", "CANCELLED"],
+    COMPLETED: [],
+    FAILED: [],
+    CANCELLED: []
+  },
+  world: {
+    DRAFT: ["REQUESTED", "READY", "LAUNCHED", "CANCELLED"],
+    REQUESTED: ["PROVISIONING", "CANCELLED"],
+    PROVISIONING: ["READY", "FAILED", "CANCELLED"],
+    READY: ["SNAPSHOTTING", "DESTROYING", "LAUNCHED", "CANCELLED"],
+    SNAPSHOTTING: ["READY", "DESTROYING"],
+    LAUNCHED: ["SNAPSHOTTING", "DESTROYING", "CANCELLED"],
+    DESTROYING: ["DESTROYED"],
+    DESTROYED: [],
+    FAILED: ["READY", "DESTROYING", "CANCELLED"],
+    CANCELLED: []
+  }
+};
+function nextStates(kind, state) {
+  return (STATE_MACHINES[kind] && STATE_MACHINES[kind][state]) || [];
+}
+function stateOptions(kind, current) {
+  const legal = nextStates(kind, current);
+  const options = [current].concat(legal);
+  return options.map(s => "<option" + (s === current ? " selected" : "") + ">" + s + "</option>").join("");
+}
+function stateHint(kind, current) {
+  const legal = nextStates(kind, current);
+  if (!legal.length) return ' <span class="muted">terminal state</span>';
+  return ' <span class="muted">→ ' + legal.join(", ") + "</span>";
+}
+
+function experimentDetail(x) {
+  return '<div class="row"><div class="field"><label>transition to</label><select id="exp-state-' + esc(x.experiment_id) + '">' +
+    stateOptions("experiment", x.state) +
+    '</select></div><button class="primary" id="exp-apply-' + esc(x.experiment_id) + '">Set state</button>' +
+    '<button id="exp-delete-' + esc(x.experiment_id) + '">Delete</button></div>' + stateHint("experiment", x.state) + pre(x);
+}
+function wireExperimentActions() {
+  document.querySelectorAll("[id^='exp-apply-']").forEach(b => b.addEventListener("click", () => run(async () => {
+    const id = b.id.replace("exp-apply-", "");
+    await api("/experiments/" + encodeURIComponent(id) + "/state", { method: "PATCH", body: JSON.stringify({ state: $("exp-state-" + id).value }) });
+    await loadExperiments();
+  })));
+  document.querySelectorAll("[id^='exp-delete-']").forEach(b => b.addEventListener("click", () => run(async () => {
+    const id = b.id.replace("exp-delete-", "");
+    if (!confirm("Delete experiment " + id + "?")) return;
+    await api("/experiments/" + encodeURIComponent(id), { method: "DELETE" });
+    await loadExperiments();
+  })));
+}
+$("experiment-filter").addEventListener("input", renderExperiments);
+
+// Runs & attempts
+async function loadRuns() {
+  const { runs } = await api("/runs");
+  runsCache = runs;
+  renderRuns();
+}
+function renderRuns() {
+  const q = ($("run-filter").value || "").trim().toLowerCase();
+  const filtered = runsCache.filter(r => !q || (r.run_id + " " + r.state).toLowerCase().includes(q));
+  if (!filtered.length) { out("run-list", '<p class="muted">no matching runs — run a suite, matrix, or bench first</p>'); return; }
+  out("run-list", '<table><tr><th>run_id</th><th>state</th><th>attempts</th><th>created_at</th></tr>' +
+    filtered.map(r => "<tr class='clickable' data-run='" + esc(r.run_id) + "'><td>" + esc(r.run_id) + "</td><td>" + stateBadge(r.state) + "</td><td>" + r.attempts.length + "</td><td class='muted'>" + esc(r.created_at) + "</td></tr>").join("") + "</table>");
+  document.querySelectorAll("tr[data-run]").forEach(tr => tr.addEventListener("click", () => run(() => loadRunDetail(tr.dataset.run))));
+}
+$("run-filter").addEventListener("input", renderRuns);
+async function loadRunDetail(runID) {
+  const run = await api("/runs/" + encodeURIComponent(runID));
+  const attempts = (run.attempts || []).slice().sort((a, b) => String(a.created_at || "").localeCompare(String(b.created_at || "")));
+  const completed = attempts.filter(a => a.state === "COMPLETED").length;
+  const failed = attempts.filter(a => a.state === "FAILED").length;
+  const retries = attempts.filter(a => a.replaces_attempt_id).length;
+  let html = '<div class="summary"><div class="stat"><b>' + attempts.length + '</b><span>attempts</span></div>' +
+    '<div class="stat"><b class="ok">' + completed + '</b><span>completed</span></div>' +
+    '<div class="stat"><b class="err">' + failed + '</b><span>failed</span></div>' +
+    '<div class="stat"><b>' + retries + '</b><span>retries</span></div></div>';
+  const matrix = matrixCells(attempts);
+  if (matrix.length) {
+    html += '<div class="card"><h3>Matrix cells</h3><table><tr><th>scenario × perturbation × control</th><th>seed</th><th>attempts</th><th>completed</th><th>failed</th><th>retries</th><th></th></tr>' +
+      matrix.map(c => "<tr><td>" + esc(c.base) + "</td><td class='muted'>" + esc(c.seed || "-") + "</td><td>" + c.total + "</td><td class='ok'>" + c.completed + "</td><td" + (c.failed ? " class='err'" : "") + ">" + c.failed + "</td><td>" + c.retries + "</td><td><a class='cell-evidence' data-attempt='" + esc(c.latestAttempt) + "'>evidence</a></td></tr>").join("") +
+      "</table></div><div class='spacer'></div>";
+  }
+  html += '<div class="timeline">';
+  for (const a of attempts) {
+    const lineage = a.replaces_attempt_id ? '<span class="muted"> ↩ retry of ' + esc(a.replaces_attempt_id) + "</span>" : "";
+    const artifacts = (a.artifacts || []).map(ar => "<span class='badge'>" + esc(ar.kind) + ":" + esc(ar.digest.slice(0, 12)) + "</span>").join(" ") || '<span class="muted">no artifacts</span>';
+    html += '<div class="tl-item' + (a.state === "FAILED" ? " failed" : "") + '"' + (a.replaces_attempt_id ? " style='margin-left:22px'" : "") + '><strong>' + esc(a.attempt_id) + "</strong> <a class='attempt-evidence' data-attempt='" + esc(a.attempt_id) + "'>evidence</a>" + lineage +
+      '<div>' + stateBadge(a.state) + ' <span class="muted">' + esc(a.created_at) + "</span></div><div>" + artifacts + "</div></div>";
+  }
+  html += "</div>";
+  html += '<div class="spacer"></div><div class="row"><div class="field"><label>transition to</label><select id="run-state">' +
+    stateOptions("run", run.state) +
+    '</select></div><button class="primary" id="run-apply">Set state</button>' +
+    '<button id="run-delete">Delete run</button>' +
+    '<button id="details-raw">Show raw JSON</button></div>' + stateHint("run", run.state) + '<div id="run-raw"></div>';
+  out("run-detail", html);
+  document.querySelectorAll("a.attempt-evidence, a.cell-evidence").forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); openEvidence(a.dataset.attempt); }));
+  $("details-raw").addEventListener("click", () => out("run-raw", pre(run)));
+  $("run-apply").addEventListener("click", () => run(async () => {
+    await api("/runs/" + encodeURIComponent(runID) + "/state", { method: "PATCH", body: JSON.stringify({ state: $("run-state").value }) });
+    await loadRunDetail(runID);
+  }));
+  $("run-delete").addEventListener("click", () => run(async () => {
+    if (!confirm("Delete run " + runID + "?")) return;
+    await api("/runs/" + encodeURIComponent(runID), { method: "DELETE" });
+    out("run-detail", "");
+    await loadRuns();
+  }));
+  out("run-list", '<a data-back="1">← back to runs</a>');
+  document.querySelectorAll("a[data-back]").forEach(a => a.addEventListener("click", () => { out("run-detail", ""); run(loadRuns); }));
+}
+
+// matrixCells groups retained-matrix/bench attempts by their cell base (attempt
+// IDs shaped like <base>-rNNN or <base>-rNNN-retryNN) and aggregates
+// completed/failed/retry counts per cell. v2 cell bases carry control and seed
+// (e.g. s01-benign-control-g4-enforce-s202); the seed is surfaced as its own
+// column. Suite runs return an empty list. latestAttempt is the most recent
+// attempt in the cell (attempts arrive sorted ascending by created_at, so the
+// last match wins).
+function matrixCells(attempts) {
+  const groups = {};
+  for (const a of attempts) {
+    const match = String(a.attempt_id || "").match(/^(.*)-r\d{3}(?:-retry\d{2})?$/);
+    if (!match) continue;
+    const cellBase = match[1];
+    const seedMatch = cellBase.match(/-s(\d+)$/);
+    const cell = groups[cellBase] = groups[cellBase] || { base: cellBase, seed: seedMatch ? seedMatch[1] : "", total: 0, completed: 0, failed: 0, retries: 0, latestAttempt: "" };
+    cell.total++;
+    if (a.state === "COMPLETED") cell.completed++;
+    else if (a.state === "FAILED") cell.failed++;
+    if (a.replaces_attempt_id) cell.retries++;
+    cell.latestAttempt = a.attempt_id;
+  }
+  return Object.keys(groups).sort().map(k => groups[k]);
+}
+
+// goToPanel activates a Studio nav panel without re-running its default loaders.
+function goToPanel(name) {
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  const btn = document.querySelector("nav button[data-panel='" + name + "']");
+  if (btn) btn.classList.add("active");
+  $("panel-" + name).classList.add("active");
+}
+
+// openEvidence jumps to the Evidence panel and loads the evidence list for an
+// attempt, leaving artifact_root empty so the server uses its configured root.
+function openEvidence(attemptID) {
+  goToPanel("evidence");
+  const form = $("form-evidence");
+  form.elements["attempt_id"].value = attemptID;
+  form.elements["artifact_root"].value = "";
+  form.requestSubmit();
+}
+
+// Run console
+$("form-console").querySelector("select[name=operation]").addEventListener("change", (e) => {
+  const suite = e.target.value === "suite";
+  $("console-suite-fields").style.display = suite ? "" : "none";
+  $("console-run-fields").style.display = suite ? "none" : "";
+});
+$("form-console").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = payload(e.target);
+  const op = data.operation;
+  delete data.operation;
+  const path = { suite: "/runs/suite", matrix: "/runs/matrix", "retained-matrix": "/runs/retained-matrix", bench: "/runs/bench" }[op];
+  out("console-out", "");
+  run(async () => {
+    const body = await api(path, { method: "POST", body: JSON.stringify(data) });
+    const total = body.total_attempts !== undefined ? body.total_attempts : body.total;
+    const summary = body.catalog_id ? body.catalog_id + " · total " + (total !== undefined ? total : "?") + " · completed " + body.completed + " · failed " + body.failed : (body.run_id ? body.run_id + " · state " + body.state : "");
+    msg("console-msg", op + " — " + esc(summary));
+    let structured = null;
+    if (body.rebuilt_manifests) structured = renderBenchReport(body);
+    else if (body.repetitions_requested !== undefined) structured = renderRetainedReport(body);
+    else if (body.total !== undefined) structured = renderMatrixReport(body);
+    else if (body.evidence && body.evidence.digest) structured = renderSuiteResult(body);
+    if (structured) {
+      out("console-out", structured + "<div class='spacer'></div><button id='console-raw'>Show raw JSON</button><div id='console-raw-out'></div>");
+      document.querySelectorAll("a.attempt-evidence").forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); openEvidence(a.dataset.attempt); }));
+      $("console-raw").addEventListener("click", () => out("console-raw-out", pre(body)));
+    } else {
+      out("console-out", pre(body));
+    }
+    await loadRuns();
+  });
+});
+
+// renderFactsTable renders a fact/value table used by the structured run views.
+function renderFactsTable(facts) {
+  return '<table><tr><th>fact</th><th>value</th></tr>' +
+    facts.map(f => "<tr><td class='muted'>" + esc(f[0]) + "</td><td>" + esc(String(f[1])) + "</td></tr>").join("") + "</table>";
+}
+
+// shortDigest abbreviates a content address for table display.
+function shortDigest(digest) {
+  return digest ? digest.slice(0, 12) + "…" : "-";
+}
+
+// renderMatrixReport renders the raw facts and per-plan results of a plain
+// matrix run.
+function renderMatrixReport(body) {
+  let html = '<div class="card"><h3>Matrix run</h3>' + renderFactsTable([
+    ["catalog_id", body.catalog_id],
+    ["total", body.total],
+    ["completed", body.completed],
+    ["failed", body.failed],
+    ["with_evidence", body.with_evidence],
+    ["with_cleanup", body.with_cleanup]
+  ]);
+  const results = body.results || [];
+  if (results.length) {
+    html += '<div class="spacer"></div><h3>Results</h3><table><tr><th>scenario</th><th>perturbation</th><th>attempt_id</th><th>state</th><th>evidence</th><th>cleanup</th><th>error</th></tr>' +
+      results.map(r => "<tr><td>" + esc(r.scenario_id) + "</td><td>" + esc(r.perturbation_id) + "</td><td><a class='attempt-evidence' data-attempt='" + esc(r.attempt_id) + "'>" + esc(r.attempt_id) + "</a></td><td>" + stateBadge(r.state) + "</td><td class='muted'>" + esc(shortDigest(r.evidence_digest)) + "</td><td class='muted'>" + esc(shortDigest(r.cleanup_digest)) + "</td><td class='err'>" + esc(r.error || "") + "</td></tr>").join("") + "</table>";
+  }
+  return html + "</div>";
+}
+
+// renderRetainedReport renders the raw facts and retained repetition results of
+// a retained-matrix run, including retry lineage.
+function renderRetainedReport(body) {
+  let html = '<div class="card"><h3>Retained matrix run</h3>' + renderFactsTable([
+    ["catalog_id", body.catalog_id],
+    ["repetitions_requested", body.repetitions_requested],
+    ["total_attempts", body.total_attempts],
+    ["completed", body.completed],
+    ["failed", body.failed],
+    ["with_evidence", body.with_evidence],
+    ["with_cleanup", body.with_cleanup]
+  ]);
+  const results = body.results || [];
+  if (results.length) {
+    html += '<div class="spacer"></div><h3>Retained results</h3><table><tr><th>attempt_id</th><th>rep</th><th>retry of</th><th>state</th><th>runtime</th><th>evidence</th><th>cleanup</th><th>error</th></tr>' +
+      results.map(r => "<tr><td><a class='attempt-evidence' data-attempt='" + esc(r.attempt_id) + "'>" + esc(r.attempt_id) + "</a></td><td>" + r.repetition + "</td><td class='muted'>" + esc(r.parent_attempt_id || "-") + "</td><td>" + stateBadge(r.state) + "</td><td class='muted'>" + esc(durationLabel(r.started_at, r.ended_at)) + "</td><td class='muted'>" + esc(shortDigest(r.evidence_digest)) + "</td><td class='muted'>" + esc(shortDigest(r.cleanup_digest)) + "</td><td class='err'>" + esc(r.error || "") + "</td></tr>").join("") + "</table>";
+  }
+  return html + "</div>";
+}
+
+// durationLabel renders a human duration between two RFC3339 timestamps, or a
+// dash when either is absent.
+function durationLabel(startedAt, endedAt) {
+  const start = new Date(startedAt).getTime();
+  const end = new Date(endedAt).getTime();
+  if (isNaN(start) || isNaN(end)) return "-";
+  const ms = Math.max(0, end - start);
+  if (ms < 1000) return ms + "ms";
+  return (ms / 1000).toFixed(1) + "s";
+}
+
+// renderBenchReport renders the raw facts of a PEIRA-Bench report: execution
+// counts, completeness and replay verification, and the rebuilt attempt
+// manifests reconstructed from on-disk artifacts.
+function renderBenchReport(report) {
+  let html = '<div class="card"><h3>PEIRA-Bench report</h3>' + renderFactsTable([
+    ["catalog_id", report.catalog_id],
+    ["repetitions", report.repetitions],
+    ["total_attempts", report.total_attempts],
+    ["completed", report.completed],
+    ["failed", report.failed],
+    ["with_evidence", report.with_evidence],
+    ["with_cleanup", report.with_cleanup],
+    ["replay_verification", report.replay_verification],
+    ["completeness_check", report.completeness_check]
+  ]);
+  const manifests = report.rebuilt_manifests || [];
+  if (manifests.length) {
+    html += '<div class="spacer"></div><h3>Rebuilt manifests</h3><table><tr><th>attempt_id</th><th>scenario</th><th>perturbation</th><th>rep</th><th>state</th><th>artifacts</th></tr>' +
+      manifests.map(m => "<tr><td><a class='attempt-evidence' data-attempt='" + esc(m.attempt_id) + "'>" + esc(m.attempt_id) + "</a></td><td>" + esc(m.scenario_id) + "</td><td>" + esc(m.perturbation_id) + "</td><td>" + m.repetition + "</td><td>" + stateBadge(m.state) + "</td><td>" + (m.artifacts || []).length + "</td></tr>").join("") + "</table>";
+  }
+  return html + "</div>";
+}
+
+// renderSuiteResult renders the raw facts of a single suite run: the run/state,
+// evidence and cleanup content addresses, and the recorded lifecycle events.
+function renderSuiteResult(body) {
+  let html = '<div class="card"><h3>Suite run</h3>' + renderFactsTable([
+    ["run_id", body.run_id],
+    ["state", body.state],
+    ["evidence", body.evidence && body.evidence.digest ? body.evidence.digest : "-"],
+    ["cleanup", body.cleanup && body.cleanup.digest ? body.cleanup.digest : "-"],
+    ["resource_usage", body.resource_usage ? resourceUsageLabel(body.resource_usage) : "-"]
+  ]);
+  const lifecycle = body.lifecycle || [];
+  if (lifecycle.length) {
+    html += '<div class="spacer"></div><h3>Lifecycle</h3><table><tr><th>from</th><th>to</th><th>actor</th><th>time</th></tr>' +
+      lifecycle.map(ev => "<tr><td>" + esc(ev.from) + "</td><td>" + esc(ev.to) + "</td><td class='muted'>" + esc(ev.actor || "") + "</td><td class='muted'>" + esc(ev.timestamp) + "</td></tr>").join("") + "</table>";
+  }
+  return html + "</div>";
+}
+
+// resourceUsageLabel renders a provider-measured resource usage fact.
+function resourceUsageLabel(usage) {
+  const cpu = usage.cpu_millis !== undefined && usage.cpu_millis > 0 ? usage.cpu_millis + "ms cpu" : "";
+  const mem = usage.memory_bytes !== undefined && usage.memory_bytes > 0 ? Math.round(usage.memory_bytes / 1024 / 1024) + "MB mem" : "";
+  return (usage.provider || "provider") + (cpu || mem ? " (" + [cpu, mem].filter(Boolean).join(" · ") + ")" : "");
+}
+
+// Evidence explorer
+$("form-evidence").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = payload(e.target);
+  run(async () => {
+    let url = "/evidence?attempt_id=" + encodeURIComponent(data.attempt_id);
+    if (data.artifact_root) url += "&artifact_root=" + encodeURIComponent(data.artifact_root);
+    const body = await api(url);
+    evidenceState = { attempt_id: data.attempt_id, artifact_root: data.artifact_root, digests: body.digests, artifacts: body.artifacts || [] };
+    renderEvidenceList();
+  });
+});
+$("export-package").addEventListener("click", () => run(async () => {
+  const form = $("form-evidence");
+  const attemptID = form.elements["attempt_id"].value.trim();
+  const artifactRoot = form.elements["artifact_root"].value.trim();
+  if (!attemptID) throw new Error("attempt_id is required to export a package");
+  let url = "/evidence/export?attempt_id=" + encodeURIComponent(attemptID);
+  if (artifactRoot) url += "&artifact_root=" + encodeURIComponent(artifactRoot);
+  const res = await fetch(client().baseURL + url, { headers: Object.assign({}, authHeaders()) });
+  if (!res.ok) throw new Error("export failed (" + res.status + "): " + (await res.text()));
+  const blob = await res.blob();
+  const digest = res.headers.get("Content-Digest") || "";
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "evidence-package-" + attemptID + ".tar";
+  link.click();
+  URL.revokeObjectURL(link.href);
+  msg("evidence-msg", "exported package for " + esc(attemptID) + (digest ? " · " + esc(digest) : ""));
+}));
+// filteredEvidence returns the artifacts matching the current kind and digest
+// prefix filters, used by both the list renderer and bulk verification.
+function filteredEvidence() {
+  if (!evidenceState) return [];
+  const q = ($("evidence-filter").value || "").trim().toLowerCase();
+  const kindFilter = ($("evidence-kind").value || "").trim();
+  return evidenceState.artifacts.filter(a => {
+    if (kindFilter && a.kind !== kindFilter) return false;
+    return !q || a.digest.toLowerCase().includes(q);
+  });
+}
+function renderEvidenceList() {
+  if (!evidenceState) return;
+  const artifacts = filteredEvidence();
+  const kinds = Array.from(new Set(evidenceState.artifacts.map(a => a.kind))).sort();
+  const kindFilter = ($("evidence-kind").value || "").trim();
+  const kindSelect = $("evidence-kind");
+  if (kindSelect.options.length - 1 !== kinds.length) {
+    kindSelect.innerHTML = '<option value="">all kinds</option>' + kinds.map(k => "<option value='" + esc(k) + "'" + (k === kindFilter ? " selected" : "") + ">" + esc(k) + "</option>").join("");
+  }
+  msg("evidence-msg", evidenceState.artifacts.length + " artifact(s) for " + esc(evidenceState.attempt_id) + (artifacts.length !== evidenceState.artifacts.length ? " · " + artifacts.length + " shown" : ""));
+  if (!artifacts.length) { out("evidence-list", '<p class="muted">no matching artifacts</p>'); return; }
+  out("evidence-list", "<ul>" + artifacts.map(a => {
+    let link = "/evidence/" + encodeURIComponent(evidenceState.attempt_id) + "/" + encodeURIComponent(a.digest);
+    if (evidenceState.artifact_root) link += "?artifact_root=" + encodeURIComponent(evidenceState.artifact_root);
+    return "<li><span class='badge'>" + esc(a.kind) + "</span><a class='evidence-link' data-attempt='" + esc(evidenceState.attempt_id) + "' data-digest='" + esc(a.digest) + "' data-root='" + esc(evidenceState.artifact_root || "") + "'>" + esc(a.digest) + "</a></li>";
+  }).join("") + "</ul>");
+  wireEvidenceLinks();
+}
+$("evidence-filter").addEventListener("input", renderEvidenceList);
+$("evidence-kind").addEventListener("change", renderEvidenceList);
+$("verify-all").addEventListener("click", () => run(async () => {
+  if (!evidenceState || !evidenceState.artifacts.length) throw new Error("load evidence first");
+  const targets = filteredEvidence();
+  if (!targets.length) throw new Error("no artifacts match the current filters");
+  const results = [];
+  for (const a of targets) {
+    const res = await api("/evidence/verify", { method: "POST", body: JSON.stringify({ attempt_id: evidenceState.attempt_id, digest: a.digest, artifact_root: evidenceState.artifact_root }) });
+    results.push({ kind: a.kind, digest: a.digest, verified: res.verified });
+  }
+  const verified = results.filter(r => r.verified).length;
+  let html = "verified " + verified + " / " + results.length + " artifact(s)" + (targets.length !== evidenceState.artifacts.length ? " (filtered subset)" : "");
+  const mismatches = results.filter(r => !r.verified);
+  if (mismatches.length) {
+    html += "<br>" + mismatches.map(m => "<span class='err'>" + esc(m.kind) + " " + esc(m.digest) + "</span>").join("<br>");
+  }
+  msg("evidence-msg", html);
+}));
+$("form-evidence-get").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = payload(e.target);
+  run(() => fetchEvidence(data.attempt_id, data.digest, data.artifact_root));
+});
+function wireEvidenceLinks() {
+  document.querySelectorAll("a.evidence-link").forEach(a => {
+    a.replaceWith(a);
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      const getForm = $("form-evidence-get");
+      getForm.elements["attempt_id"].value = a.dataset.attempt;
+      getForm.elements["digest"].value = a.dataset.digest;
+      if (a.dataset.root) getForm.elements["artifact_root"].value = a.dataset.root;
+      run(() => fetchEvidence(a.dataset.attempt, a.dataset.digest, a.dataset.root));
+    });
+  });
+}
+async function fetchEvidence(attemptID, digest, artifactRoot) {
+  let url = "/evidence/" + encodeURIComponent(attemptID) + "/" + encodeURIComponent(digest);
+  if (artifactRoot) url += "?artifact_root=" + encodeURIComponent(artifactRoot);
+  const res = await fetch(client().baseURL + url);
+  const text = await res.text();
+  if (!res.ok) throw new Error("evidence fetch failed (" + res.status + "): " + text);
+  let shown = text;
+  try { shown = JSON.stringify(JSON.parse(text), null, 2); } catch { if (text.length > 2000) shown = text.slice(0, 2000) + "\n … (truncated)"; }
+  msg("evidence-get-msg", attemptID + " / " + esc(digest) + " — " + text.length + " bytes");
+  out("evidence-get-out", '<div class="pre">' + esc(shown) + "</div>");
+}
+
+// Evidence integrity verification
+$("form-evidence-verify").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const data = payload(e.target);
+  run(async () => {
+    const body = await api("/evidence/verify", { method: "POST", body: JSON.stringify(data) });
+    msg("evidence-verify-msg", (body.verified ? "verified" : "DIGEST MISMATCH") + " for " + esc(data.digest));
+    out("evidence-verify-out", pre(body));
+  });
+});
+
+// Scenario compile
+$("form-compile").addEventListener("submit", (e) => {
+  e.preventDefault();
+  run(async () => {
+    const body = await api("/scenarios/compile", { method: "POST", body: JSON.stringify(payload(e.target)) });
+    msg("compile-msg", "compiled — source_digest " + esc(body.source_digest) + " · ir_digest " + esc(body.ir_digest));
+    out("compile-out", pre(body));
+  });
+});
+
+// Audit events
+let auditCache = [];
+async function loadAudit() {
+  const limit = parseInt($("audit-limit").value, 10) || 100;
+  const body = await api("/audit-events?limit=" + encodeURIComponent(limit));
+  auditCache = body.events || [];
+  renderAudit();
+}
+function renderAudit() {
+  const q = ($("audit-filter").value || "").trim().toLowerCase();
+  const filtered = auditCache.filter(ev => !q || (ev.path + " " + ev.method + " " + (ev.actor || "") + " " + (ev.tenant || "")).toLowerCase().includes(q));
+  if (!filtered.length) { out("audit-list", '<p class="muted">no matching audit events</p>'); return; }
+  out("audit-list", '<table><tr><th>time</th><th>actor</th><th>tenant</th><th>method</th><th>path</th><th>status</th><th>ms</th><th>error</th></tr>' +
+    filtered.map(ev => "<tr><td class='muted'>" + esc(ev.timestamp) + "</td><td>" + esc(ev.actor || "-") + "</td><td class='muted'>" + esc(ev.tenant || "-") + "</td><td>" + esc(ev.method) + "</td><td>" + esc(ev.path) + "</td><td" + (ev.status >= 400 ? " class='err'" : "") + ">" + ev.status + "</td><td class='muted'>" + ev.duration_ms + "</td><td class='err'>" + esc(ev.error || "") + "</td></tr>").join("") + "</table>");
+}
+$("audit-filter").addEventListener("input", renderAudit);
+$("audit-limit").addEventListener("change", () => run(loadAudit));
+
+run(loadOverview);
+run(loadRuns);
+run(loadBranches);
+run(loadWorlds);
+run(loadExperiments);
+run(loadBindings);
+run(loadAudit);
+</script>
+</body>
+</html>

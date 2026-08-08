@@ -1,0 +1,63 @@
+# PEIRAVELA-open
+
+The **Apache-2.0** SDK/UI surface of [PEIRAVELA](https://github.com/axisrobo/peiravela):
+generated client libraries, the public API contract, the Studio frontend,
+examples, and prebuilt binaries. The AGPL-3.0 control-plane core lives in the
+`peiravela` repository; enterprise features live in `peiravela-ee`.
+
+## What's here
+
+| Path | Contents |
+| --- | --- |
+| `sdk/ts/peiravela.ts` | Generated TypeScript client (from the OpenAPI spec) |
+| `sdk/js/peiravela.js` | Generated JavaScript client (ES module) |
+| `contracts/openapi/peiravela-v1.openapi.json` | Public REST API specification |
+| `contracts/schemas/` | Public format contracts (scenario, evidence, catalog v2, ...) |
+| `contracts/fixtures/valid/` | Public valid fixtures for the schemas |
+| `studio/` | The Studio console frontend (served by the core API server) |
+| `examples/` | Quickstart and worked examples |
+| `scripts/verify-package-independent.ps1` | Independent evidence-package consumer (tar + SHA-256 only) |
+
+## Using the SDK
+
+```ts
+import { PeiravelaClient } from "./sdk/ts/peiravela";
+
+const api = new PeiravelaClient("http://127.0.0.1:8080", {});
+const health = await api.health();
+const worlds = await api.listWorlds();
+```
+
+The JS client is the same surface in an ES module:
+
+```js
+import PeiravelaClient from "./sdk/js/peiravela.js";
+```
+
+## Prebuilt binaries
+
+Binaries are built from the AGPL-3.0 core and distributed under AGPL-3.0 terms
+(see the `peiravela` repository). Release assets are attached to the tags on
+this repository's Releases page; each build records its core source revision.
+
+## Studio
+
+The Studio console is the web UI served by the core `api-server`. The frontend
+sources in `studio/` are published here so consumers can theme, embed, or
+inspect them under Apache-2.0.
+
+## Independent verification
+
+Evidence packages can be consumed without any PEIRAVELA tooling:
+
+```powershell
+pwsh scripts/verify-package-independent.ps1 -Package evidence-package.tar -OutDir ./consume
+```
+
+This mirrors what an external evaluator does: tar + SHA-256 only, no
+pass/fail imports.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE). The PEIRAVELA core (control plane,
+adapters, catalogs) is AGPL-3.0 in the `peiravela` repository.

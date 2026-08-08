@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/experiment-source-binding-v1.json",
+  "title": "PEIRAVELA Experiment Source Binding v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "api_version",
+    "kind",
+    "source_id",
+    "source_kind",
+    "source_revision",
+    "source_digest",
+    "mapping_version",
+    "status",
+    "tracks",
+    "provenance"
+  ],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "ExperimentSourceBinding"},
+    "source_id": {"type": "string", "minLength": 1},
+    "source_kind": {"enum": ["benchmark-suite", "experiment-plan", "scenario-catalog"]},
+    "source_revision": {"type": "string", "minLength": 1},
+    "source_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "mapping_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "status": {"enum": ["draft", "frozen", "deprecated"]},
+    "tracks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/experimentTrackBinding"}
+    },
+    "evaluation_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["external_evaluator_required", "judgments_owned_by_peiravela"],
+      "properties": {
+        "external_evaluator_required": {"const": true},
+        "judgments_owned_by_peiravela": {"const": false}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state_label", "source_uri"],
+      "properties": {
+        "state_label": {"enum": ["observed", "replayed", "synthetic", "simulated", "predicted", "derived"]},
+        "source_uri": {"type": "string", "format": "uri"}
+      }
+    }
+  },
+  "$defs": {
+    "experimentTrackBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "track_id",
+        "status",
+        "scenario_catalog_digest",
+        "perturbation_catalog_digest",
+        "world_contract_digest",
+        "evidence_schema_digest",
+        "evaluation_binding"
+      ],
+      "properties": {
+        "track_id": {"type": "string", "minLength": 1},
+        "status": {"enum": ["draft", "frozen", "deprecated"]},
+        "scenario_catalog_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "perturbation_catalog_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "world_contract_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "control_catalog_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$", "description": "Digest of the catalog v2 controls axis, present for v2 catalogs"},
+        "seed_catalog_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$", "description": "Digest of the catalog v2 seeds axis, present for v2 catalogs"},
+        "evidence_schema_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "evaluation_binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["oracle_digest", "external_evaluator_required", "judgments_owned_by_peiravela"],
+          "properties": {
+            "oracle_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+            "external_evaluator_required": {"const": true},
+            "judgments_owned_by_peiravela": {"const": false}
+          }
+        }
+      }
+    }
+  }
+}

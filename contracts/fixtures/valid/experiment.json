@@ -1,0 +1,12 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "Experiment",
+  "id": "synthetic-experiment",
+  "version": "1.0.0",
+  "scenario_ref": "synthetic-safe-operation@1.0.0",
+  "root_world_ref": "local-synthetic-world@1.0.0",
+  "matrix": {"seeds": [101]},
+  "repetitions": 1,
+  "retry_policy": {"max_attempts": 2},
+  "cleanup": "destroy-world"
+}

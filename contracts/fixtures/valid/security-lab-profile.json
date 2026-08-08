@@ -1,0 +1,17 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "SecurityLabProfile",
+  "id": "security-lab",
+  "version": "1.0.0",
+  "domains": [{
+    "id": "defensive-control",
+    "status": "active",
+    "categories": [{"id": "cross-plane-mediation", "status": "frozen", "suite_refs": ["loimos3"]}]
+  }],
+  "safety_boundary": {
+    "synthetic_or_controlled_targets_only": true,
+    "public_egress_allowed": false,
+    "production_credentials_allowed": false
+  },
+  "provenance": {"state_label": "synthetic", "source_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+}

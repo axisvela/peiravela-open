@@ -1,0 +1,22 @@
+{
+  "api_version": "peiravela/v1",
+  "bundle": "peiravela-contracts-v1",
+  "schemas": {
+    "world_template": "world-template-v1.schema.json",
+    "scenario": "scenario-v1.schema.json",
+    "experiment": "experiment-v1.schema.json",
+    "counterfactual_branch": "counterfactual-branch-v1.schema.json",
+    "run_manifest": "run-manifest-v1.schema.json",
+    "simulation_evidence": "simulation-evidence-v1.schema.json",
+    "evidence_package": "evidence-package-v1.schema.json",
+    "experiment_source_binding": "experiment-source-binding-v1.schema.json",
+    "security_lab_profile": "security-lab-profile-v1.schema.json",
+    "jacob_profile": "jacob-profile-v1.schema.json",
+    "suite_catalog_v2": "suite-catalog-v2.schema.json"
+  },
+  "compatibility": {
+    "breaking_change_requires": "new-major-schema-version",
+    "published_schema_is_mutable": false,
+    "fixtures_required_for": ["valid", "invalid", "migration"]
+  }
+}

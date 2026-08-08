@@ -1,0 +1,10 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "CounterfactualBranch",
+  "id": "synthetic-violation-branch",
+  "root_snapshot_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "mutation_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "namespace": "run-001-branch-violation",
+  "isolation_proof_ref": "artifact://isolation-proof.json",
+  "cleanup_required": true
+}

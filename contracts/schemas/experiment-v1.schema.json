@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/experiment-v1.json",
+  "title": "PEIRAVELA Experiment v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "id", "version", "scenario_ref", "root_world_ref", "matrix", "repetitions", "retry_policy", "cleanup"],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "Experiment"},
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "scenario_ref": {"type": "string", "minLength": 1},
+    "root_world_ref": {"type": "string", "minLength": 1},
+    "matrix": {"type": "object", "minProperties": 1},
+    "repetitions": {"type": "integer", "minimum": 1},
+    "retry_policy": {"type": "object", "required": ["max_attempts"], "properties": {"max_attempts": {"type": "integer", "minimum": 1}}},
+    "cleanup": {"const": "destroy-world"},
+    "source_binding_ref": {"type": "string"}
+  }
+}

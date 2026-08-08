@@ -1,0 +1,10 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "Scenario",
+  "id": "synthetic-safe-operation",
+  "version": "1.0.0",
+  "world_ref": "local-synthetic-world@1.0.0",
+  "actors": [{"id": "agent-01", "kind": "software-agent"}],
+  "steps": [{"id": "safe-operation", "actor": "agent-01", "op": "write_marker"}],
+  "provenance": {"state_label": "synthetic", "source_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}
+}

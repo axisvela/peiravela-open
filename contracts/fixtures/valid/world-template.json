@@ -1,0 +1,11 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "WorldTemplate",
+  "id": "local-synthetic-world",
+  "version": "1.0.0",
+  "provider": "local",
+  "topology": "single-process-isolated-filesystem",
+  "resource_spec": {"cpu": 1, "memory_mib": 512},
+  "cleanup": {"ttl_seconds": 300, "residual_scan_required": true},
+  "provenance": {"state_label": "synthetic", "source_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}
+}

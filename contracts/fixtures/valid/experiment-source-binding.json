@@ -1,0 +1,24 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "ExperimentSourceBinding",
+  "source_id": "example-benchmark",
+  "source_kind": "benchmark-suite",
+  "source_revision": "example-frozen-revision",
+  "source_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+  "mapping_version": "1.0.0",
+  "status": "frozen",
+  "tracks": [{
+    "track_id": "EXAMPLE",
+    "status": "frozen",
+    "scenario_catalog_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+    "perturbation_catalog_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+    "world_contract_digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+    "evidence_schema_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+    "evaluation_binding": {
+      "oracle_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "external_evaluator_required": true,
+      "judgments_owned_by_peiravela": false
+    }
+  }],
+  "provenance": {"state_label": "observed", "source_uri": "https://example.invalid/benchmark"}
+}

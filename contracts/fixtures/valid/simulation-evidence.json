@@ -1,0 +1,16 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "SimulationEvidence",
+  "experiment_id": "synthetic-experiment",
+  "run_id": "run-001",
+  "attempt_id": "attempt-001",
+  "inputs": {
+    "world_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "scenario_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "sut_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "execution": {"seed": 101, "started_at": "2026-08-03T00:00:00Z", "ended_at": "2026-08-03T00:00:01Z", "exit_status": "completed"},
+  "observations": {"missing_event_declaration": "none"},
+  "integrity": {"artifact_manifest_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"},
+  "cleanup": {"verified": true, "residual_scan_ref": "artifact://residual-scan.json"}
+}

@@ -1,0 +1,33 @@
+{
+  "api_version": "peiravela/v2",
+  "kind": "SuiteCatalog",
+  "id": "fixture-suite",
+  "version": "2.0.0",
+  "owner": "contract-test",
+  "world_contract": {
+    "namespace": "contract-test/suite",
+    "requires": {
+      "network_isolation": true,
+      "egress_control": true,
+      "identity_scoping": true,
+      "disposable": true
+    }
+  },
+  "scenarios": [
+    {
+      "id": "s01",
+      "family": "test",
+      "title": "fixture scenario",
+      "steps": [
+        { "operation": "observe", "target": "plane" }
+      ]
+    }
+  ],
+  "perturbations": [
+    { "id": "benign-control", "label": "benign", "scenario": "*" }
+  ],
+  "controls": [
+    { "id": "g4-observe", "adapter": "g4-observe", "selectors": ["g4-event", "g4-policy"] }
+  ],
+  "seeds": [101]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/counterfactual-branch-v1.json",
+  "title": "PEIRAVELA CounterfactualBranch v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "id", "root_snapshot_digest", "mutation_digest", "namespace", "isolation_proof_ref", "cleanup_required"],
+  "properties": {
+    "api_version": {"const": "peiravela/v1"},
+    "kind": {"const": "CounterfactualBranch"},
+    "id": {"type": "string", "minLength": 1},
+    "root_snapshot_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "mutation_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "namespace": {"type": "string", "minLength": 1},
+    "isolation_proof_ref": {"type": "string", "minLength": 1},
+    "cleanup_required": {"const": true}
+  }
+}

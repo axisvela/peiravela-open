@@ -1,0 +1,13 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "RunManifest",
+  "experiment_id": "synthetic-experiment",
+  "run_id": "run-001",
+  "attempt_id": "attempt-001",
+  "world_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "scenario_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "seed": 101,
+  "clock": "virtual",
+  "dependencies": {"provider": "local@1.0.0"},
+  "created_at": "2026-08-03T00:00:00Z"
+}

@@ -1,0 +1,31 @@
+{
+  "api_version": "peiravela/v1",
+  "kind": "ExperimentSourceBinding",
+  "source_id": "axisrobo",
+  "source_kind": "scenario-catalog",
+  "source_revision": "v2-draft",
+  "source_digest": "sha256:e120696de66467d94112d1281c7545dcc506a9865e905fb883781e94c3ec17a2",
+  "mapping_version": "1.0.0",
+  "status": "frozen",
+  "tracks": [
+    {
+      "track_id": "loimos3",
+      "status": "frozen",
+      "scenario_catalog_digest": "sha256:19d2b52a9cdb4d533ea1b7f5e9ccc7374c6fe51c0aad4eae1ea314636669d91d",
+      "perturbation_catalog_digest": "sha256:d989c4f16e5a153089a715b94f337b8e6a02c997a21fa0deef9fda4bfe411b8c",
+      "world_contract_digest": "sha256:6957526a41c1b45720e4b009b0206a3027a6e118e46af4214fecfb3d733e92dc",
+      "control_catalog_digest": "sha256:0e280855db8df6413bfc805f1835d413e0a2fcdd7bef48a8ddbdecd5ac7b3dfc",
+      "seed_catalog_digest": "sha256:6251b266c29efaa1b7377992b2bde7fd92eb600e6eec9bd11745c33866e854a0",
+      "evidence_schema_digest": "sha256:24e3763247d3235e3aa958aadcce917ebfe62d437dfa9c4cfd06ede1db448f86",
+      "evaluation_binding": {
+        "external_evaluator_required": true,
+        "judgments_owned_by_peiravela": false,
+        "oracle_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "provenance": {
+    "source_uri": "catalog://loimos3/2.0.0",
+    "state_label": "derived"
+  }
+}
