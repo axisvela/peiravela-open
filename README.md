@@ -5,6 +5,17 @@ generated client libraries, the public API contract, the Studio frontend,
 examples, and prebuilt binaries. The AGPL-3.0 control-plane core lives in the
 `peiravela` repository; enterprise features live in `peiravela-ee`.
 
+## What this gives you
+
+- **Generated TypeScript and JavaScript clients** for the PEIRAVELA control-plane
+  API, so you can drive worlds, runs, evidence, and control-variant comparison
+  from your own code.
+- **The public API contract** (OpenAPI) and the format schemas that make every
+  `SimulationEvidence` package independently verifiable.
+- **The Studio console** frontend (themes/embed source under Apache-2.0).
+- **Examples and an independent evidence verifier** (tar + SHA-256 only) so an
+  external evaluator never has to trust PEIRAVELA's tooling.
+
 ## What's here
 
 | Path | Contents |
