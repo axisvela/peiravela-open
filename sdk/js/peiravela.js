@@ -8,7 +8,7 @@ class PeiravelaClient {
   }
 
   async fetch(input, init = {}) {
-    const res = await window.fetch(this.baseURL + input, Object.assign({ headers: this.headers }, init));
+    const res = await fetch(this.baseURL + input, Object.assign({ headers: this.headers }, init));
     const text = await res.text();
     let parsed;
     try { parsed = JSON.parse(text); } catch { parsed = text; }

@@ -308,6 +308,7 @@ export interface ControlAggregate {
   incomplete: number;
   mean_memory_bytes?: number;
   mean_cpu_millis?: number;
+  mean_runtime_ms?: number;
   resource_provider?: string;
   resource_reported: boolean;
   variants?: string[];
@@ -531,7 +532,7 @@ export class PeiravelaClient {
   }
 
   private async fetch(input: string, init: RequestInit = {}): Promise<any> {
-    const res = await window.fetch(this.baseURL + input, Object.assign({ headers: this.headers }, init));
+    const res = await fetch(this.baseURL + input, Object.assign({ headers: this.headers }, init));
     const text = await res.text();
     let parsed: any;
     try { parsed = JSON.parse(text); } catch { parsed = text; }
