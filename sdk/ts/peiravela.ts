@@ -339,6 +339,7 @@ export interface SuiteRunResponse {
 export interface RunResult {
   scenario_id: string;
   perturbation_id: string;
+  control_id?: string;
   label?: string;
   attempt_id: string;
   state: string;
