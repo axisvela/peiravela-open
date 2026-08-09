@@ -1,8 +1,12 @@
 # PEIRAVELA-open
 
-The **Apache-2.0** SDK/UI surface of [PEIRAVELA](https://github.com/axisrobo/peiravela):
+**PEIRAVELA** is the AxisRobo possible-world experiment control plane for
+autonomous systems: it creates governed simulation worlds, runs reproducible
+scenario × perturbation × control × seed experiments, and emits
+provenance-complete raw `SimulationEvidence` that any independent evaluator can
+verify. This repository is the **Apache-2.0 SDK/UI tier** of PEIRAVELA —
 generated client libraries, the public API contract, the Studio frontend,
-examples, and prebuilt binaries. The AGPL-3.0 control-plane core lives in the
+examples, and binaries. The AGPL-3.0 control-plane core lives in the
 `peiravela` repository; enterprise features live in `peiravela-ee`.
 
 ## What this gives you
