@@ -6,46 +6,27 @@ on:
       - "v*"
   workflow_dispatch:
 
-# The binaries are built from the AGPL core repository (axisrobo/peiravela),
-# which is currently private. The checkout needs a repository-scoped PAT with
-# read access to that repo, stored as the PEIRAVELA_CORE_CHECKOUT_TOKEN secret
-# in this repository. When the core becomes public the secret is unnecessary.
-env:
-  CORE_CHECKOUT_TOKEN: ${{ secrets.PEIRAVELA_CORE_CHECKOUT_TOKEN }}
-
+# Binaries are prebuilt from the AGPL core by the core's
+# scripts/mirror-binaries.ps1 and committed under bin/ (gitignored, added with
+# git add -f). This workflow uploads those committed binaries to the GitHub
+# Release for each tag, so no cross-repo checkout token is required.
 jobs:
-  build:
+  upload:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          repository: axisrobo/peiravela
-          path: core
-          token: ${{ env.CORE_CHECKOUT_TOKEN }}
 
-      - name: Checkout is not required to be public
+      - name: Verify binaries are present and versioned
         run: |
-          if [ -z "$CORE_CHECKOUT_TOKEN" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
-            echo "PEIRAVELA_CORE_CHECKOUT_TOKEN is not set; configure a PAT with read access to axisrobo/peiravela to build binaries from the private core."
-          fi
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version: "1.25"
-          cache-dependency-path: core/go.work.sum
-
-      - name: Build core binaries
-        working-directory: core
-        run: |
-          mkdir -p ../dist
-          CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }}" -o ../dist/peiravela-api-server ./backend/cmd/api-server
-          CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }}" -o ../dist/peiravela-control-plane ./backend/cmd/control-plane
+          test -f bin/peiravela-api-server
+          test -f bin/peiravela-control-plane
+          strings bin/peiravela-api-server | grep -q "${{ github.ref_name }}"
+          strings bin/peiravela-control-plane | grep -q "${{ github.ref_name }}"
 
       - name: Upload binaries to release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/peiravela-api-server
-            dist/peiravela-control-plane
+            bin/peiravela-api-server
+            bin/peiravela-control-plane
           generate_release_notes: true
