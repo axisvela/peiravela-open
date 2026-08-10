@@ -20,6 +20,8 @@ jobs:
         run: |
           test -f bin/peiravela-api-server
           test -f bin/peiravela-control-plane
+          test -f bin/peiravela-api-server.exe
+          test -f bin/peiravela-control-plane.exe
           strings bin/peiravela-api-server | grep -q "${{ github.ref_name }}"
           strings bin/peiravela-control-plane | grep -q "${{ github.ref_name }}"
 
@@ -29,4 +31,6 @@ jobs:
           files: |
             bin/peiravela-api-server
             bin/peiravela-control-plane
+            bin/peiravela-api-server.exe
+            bin/peiravela-control-plane.exe
           generate_release_notes: true

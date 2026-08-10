@@ -18,9 +18,9 @@ Beta-readiness milestone, mirrored from the core `peiravela` tag
   branch panel, evidence export/verify).
 - `studio/peiravela.js` runtime client added to match the core Studio.
 - Prebuilt AGPL-3.0 core binaries committed under `bin/`
-  (`peiravela-api-server`, `peiravela-control-plane`, Linux amd64, tagged with
-  `v0.2.0-beta.1`). The `release.yml` tag workflow also attaches freshly built
-  binaries to the GitHub Release for each tag.
+  (`peiravela-api-server`, `peiravela-control-plane`, Linux amd64 + Windows
+  amd64 `.exe`, tagged with `v0.2.0-beta.1`). The `release.yml` tag workflow
+  also attaches freshly built binaries to the GitHub Release for each tag.
 - `release.yml` injects the tag into the built binaries via `-ldflags` and drops
   the non-existent `cmd/worker` build.
 
