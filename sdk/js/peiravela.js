@@ -66,6 +66,7 @@ class PeiravelaClient {
   listBranches() { return this.fetch("/branches"); }
   getBranch(branchID) { return this.fetch("/branches/" + encodeURIComponent(branchID)); }
   verifyEvidence(req) { return this.fetch("/evidence/verify", { method: "POST", body: JSON.stringify(req) }); }
+  aggregateControls(req) { return this.fetch("/controls/aggregate", { method: "POST", body: JSON.stringify(req) }); }
   listAuditEvents(limit) {
     let url = "/audit-events";
     if (limit) url += "?limit=" + encodeURIComponent(limit);

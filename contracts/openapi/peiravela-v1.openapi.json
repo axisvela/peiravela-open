@@ -740,6 +740,7 @@
           "incomplete": { "type": "integer" },
           "mean_memory_bytes": { "type": "integer" },
           "mean_cpu_millis": { "type": "integer" },
+          "mean_runtime_ms": { "type": "integer", "description": "Mean measured host execution time per attempt (duration_ms, independent of the virtual clock)" },
           "resource_provider": { "type": "string" },
           "resource_reported": { "type": "boolean" },
           "variants": { "type": "array", "items": { "type": "string" } },
@@ -865,6 +866,7 @@
         "properties": {
           "scenario_id": { "type": "string" },
           "perturbation_id": { "type": "string" },
+          "control_id": { "type": "string" },
           "label": { "type": "string" },
           "attempt_id": { "type": "string" },
           "state": { "type": "string" },
@@ -879,6 +881,7 @@
         "properties": {
           "scenario_id": { "type": "string" },
           "perturbation_id": { "type": "string" },
+          "control_id": { "type": "string" },
           "label": { "type": "string" },
           "attempt_id": { "type": "string" },
           "state": { "type": "string" },

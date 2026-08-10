@@ -591,6 +591,7 @@ export class PeiravelaClient {
   listBranches(): Promise<BranchListResponse> { return this.fetch("/branches"); }
   getBranch(branchID: string): Promise<BranchRecord> { return this.fetch("/branches/" + encodeURIComponent(branchID)); }
   verifyEvidence(req: VerifyEvidenceRequest): Promise<VerifyEvidenceResponse> { return this.fetch("/evidence/verify", { method: "POST", body: JSON.stringify(req) }); }
+  aggregateControls(req: ControlsAggregateRequest): Promise<ControlsAggregateResponse> { return this.fetch("/controls/aggregate", { method: "POST", body: JSON.stringify(req) }); }
   listAuditEvents(limit?: number): Promise<{ events: AuditEvent[] }> {
     let url = "/audit-events";
     if (limit) url += "?limit=" + encodeURIComponent(String(limit));

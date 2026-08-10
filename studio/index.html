@@ -465,11 +465,12 @@ $("form-controls").addEventListener("submit", (e) => {
       const usage = c.resource_reported
         ? esc(c.resource_provider || "provider") + (c.mean_memory_bytes > 0 ? " · " + Math.round(c.mean_memory_bytes / 1024 / 1024) + "MB mem" : "") + (c.mean_cpu_millis > 0 ? " · " + c.mean_cpu_millis + "ms cpu" : "")
         : '<span class="muted">unreported</span>';
+      const runtime = c.mean_runtime_ms > 0 ? esc(c.mean_runtime_ms + "ms runtime") : '<span class="muted">-</span>';
       const scenarioCells = (c.scenarios || []).map(sc =>
-        "<tr><td class='muted'></td><td>" + esc(sc.scenario_id) + "</td><td>" + sc.attempts + "</td><td class='ok'>" + sc.with_evidence + "</td><td" + (sc.incomplete ? " class='err'" : "") + ">" + sc.incomplete + "</td><td class='muted'></td><td class='muted'></td></tr>").join("");
-      return "<tr><td>" + esc(c.control_id) + "</td><td>" + esc(c.adapter) + "</td><td>" + opts + "</td><td>" + c.plan_count + "</td><td>" + c.attempts + "</td><td class='ok'>" + c.with_evidence + "</td><td" + (c.incomplete ? " class='err'" : "") + ">" + c.incomplete + "</td><td class='muted'>" + usage + "</td><td>" + (c.variants || []).map(v => "<span class='badge'>" + esc(v) + "</span>").join(" ") + "</td></tr>" + scenarioCells;
+        "<tr><td class='muted'></td><td>" + esc(sc.scenario_id) + "</td><td class='muted'></td><td>" + sc.attempts + "</td><td class='ok'>" + sc.with_evidence + "</td><td" + (sc.incomplete ? " class='err'" : "") + ">" + sc.incomplete + "</td><td class='muted'></td><td class='muted'></td><td class='muted'></td></tr>").join("");
+      return "<tr><td>" + esc(c.control_id) + "</td><td>" + esc(c.adapter) + "</td><td>" + opts + "</td><td>" + c.plan_count + "</td><td>" + c.attempts + "</td><td class='ok'>" + c.with_evidence + "</td><td" + (c.incomplete ? " class='err'" : "") + ">" + c.incomplete + "</td><td class='muted'>" + usage + "</td><td class='muted'>" + runtime + "</td><td>" + (c.variants || []).map(v => "<span class='badge'>" + esc(v) + "</span>").join(" ") + "</td></tr>" + scenarioCells;
     }).join("");
-    out("controls-out", '<table><tr><th>control_id</th><th>adapter</th><th>options</th><th>plan cells</th><th>attempts</th><th>with evidence</th><th>incomplete</th><th>resource usage</th><th>variants</th></tr>' + rows + "<tr><td colspan='9' class='muted'>per-scenario rows are indented below their control (scenario × attempts × evidence)</td></tr></table>");
+    out("controls-out", '<table><tr><th>control_id</th><th>adapter</th><th>options</th><th>plan cells</th><th>attempts</th><th>with evidence</th><th>incomplete</th><th>resource usage</th><th>runtime</th><th>variants</th></tr>' + rows + "<tr><td colspan='10' class='muted'>per-scenario rows are indented below their control (scenario × attempts × evidence)</td></tr></table>");
   });
 });
 
