@@ -38,9 +38,8 @@ jobs:
         working-directory: core
         run: |
           mkdir -p ../dist
-          CGO_ENABLED=0 go build -o ../dist/peiravela-api-server ./backend/cmd/api-server
-          CGO_ENABLED=0 go build -o ../dist/peiravela-control-plane ./backend/cmd/control-plane
-          CGO_ENABLED=0 go build -o ../dist/peiravela-worker ./backend/cmd/worker
+          CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }}" -o ../dist/peiravela-api-server ./backend/cmd/api-server
+          CGO_ENABLED=0 go build -ldflags "-X main.version=${{ github.ref_name }}" -o ../dist/peiravela-control-plane ./backend/cmd/control-plane
 
       - name: Upload binaries to release
         if: startsWith(github.ref, 'refs/tags/')
@@ -49,5 +48,4 @@ jobs:
           files: |
             dist/peiravela-api-server
             dist/peiravela-control-plane
-            dist/peiravela-worker
           generate_release_notes: true

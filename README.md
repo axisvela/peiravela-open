@@ -31,6 +31,7 @@ examples, and binaries. The AGPL-3.0 control-plane core lives in the
 | `contracts/fixtures/valid/` | Public valid fixtures for the schemas |
 | `studio/` | The Studio console frontend (served by the core API server) |
 | `examples/` | Quickstart and worked examples |
+| `bin/` | Prebuilt AGPL-3.0 core binaries (`peiravela-api-server`, `peiravela-control-plane`), Linux amd64, tagged with the matching core release version |
 | `scripts/verify-package-independent.ps1` | Independent evidence-package consumer (tar + SHA-256 only) |
 
 ## Using the SDK
