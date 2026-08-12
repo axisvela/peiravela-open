@@ -3,6 +3,21 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [0.3.0-beta] - 2026-08-12
+
+Beta label applied across all three tiers, mirrored from the core `peiravela`
+tag `v0.3.0-beta`:
+
+- Prebuilt AGPL-3.0 core binaries refreshed under `bin/` for `v0.3.0-beta`
+  (Linux amd64 + Windows amd64 `.exe`, version embedded via `-ldflags`); the
+  tag `release.yml` uploads freshly built binaries to the GitHub Release for
+  each `v*` tag.
+- `release.yml` builds and uploads committed core binaries on tag with no core
+  checkout token required.
+- SDK/OpenAPI/Studio surface synced with the core `v0.3.0-beta` (deployment
+  manifests and release automation live in the core repo; this tier carries the
+  generated clients, OpenAPI, Studio, examples, and binaries).
+
 ## [0.2.0-beta.1] - 2026-08-10
 
 Beta-readiness milestone, mirrored from the core `peiravela` tag
