@@ -3,6 +3,18 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [0.7.0] - 2026-08-13
+
+Mirrored from the core `peiravela` tag `v0.7.0` (container real execution; see
+the core CHANGELOG):
+
+- Prebuilt AGPL-3.0 core binaries committed under `bin/` for `v0.7.0` (Linux
+  amd64 + Windows amd64 `.exe`, version embedded via `-ldflags`).
+- No SDK/OpenAPI/Studio surface changes in this version; the container
+  execution path is core-only.
+- GitHub Release `v0.7.0` published with the binaries and the core changelog
+  diff (`v0.6.0` → `v0.7.0`).
+
 ## [0.6.0] - 2026-08-13
 
 Mirrored from the core `peiravela` tag `v0.6.0` (distributed execution and
