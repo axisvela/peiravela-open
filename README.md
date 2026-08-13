@@ -95,6 +95,14 @@ deployment without depending on the AGPL core:
 | `bin/` | Prebuilt AGPL-3.0 core binaries, Linux amd64 + Windows amd64 (`.exe`), tagged with the matching core release version |
 | `scripts/verify-package-independent.ps1` | Independent evidence-package consumer (tar + SHA-256 only) |
 
+## Documentation
+
+| Document | Purpose |
+| --- | --- |
+| [Operations manual](docs/operations.md) | Running the SDK, Studio, evidence verification, binaries, and the release procedure |
+| [Development manual](docs/development.md) | Repo layout, sync model from the core, working on Studio/examples, CI, and release mechanics |
+| [Quickstart](examples/quickstart.md) | Externally runnable CLI / client / Studio walkthrough |
+
 ## Using the SDK
 
 ```ts
