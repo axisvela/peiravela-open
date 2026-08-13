@@ -139,6 +139,33 @@ export interface SimulationEvidence {
   run_id: string;
 }
 
+export interface SimulationEvidenceV2 {
+  api_version: "peiravela/v2";
+  attempt_id: string;
+  auth?: { steps: { chain: "h" | "a" | "k" | "s"[]; declared_absent: string[]; principals?: Record<string, unknown>; step_id: string }[] };
+  cleanup: { residual_scan_ref: string; verified: boolean };
+  execution: Record<string, unknown>;
+  experiment_id: string;
+  inputs: Record<string, unknown>;
+  integrity: Record<string, unknown>;
+  kind: "SimulationEvidence";
+  observations: Record<string, unknown>;
+  run_id: string;
+}
+
+export interface SuiteCatalog {
+  api_version: "peiravela/v2";
+  controls?: { adapter: string; id: string; options?: Record<string, unknown>; selectors?: string[] }[];
+  id: string;
+  kind: "SuiteCatalog";
+  owner: string;
+  perturbations?: { id: string; label: string; mutations?: { patch: { content: string; id: string } }[]; scenario: string }[];
+  scenarios: { family?: string; id: string; steps: { operation: string; target: string }[]; title?: string }[];
+  seeds?: number[];
+  version: string;
+  world_contract: { namespace: string; requires: { disposable: boolean; egress_control: boolean; identity_scoping: boolean; network_isolation: boolean } };
+}
+
 export interface WorldTemplateProvenance {
   source_digest: string;
   state_label: "observed" | "replayed" | "synthetic" | "simulated" | "predicted" | "derived";
