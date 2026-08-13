@@ -1,15 +1,73 @@
+# PEIRAVELA
+
+**Autonomous-System Simulation, Experimentation & Validation Platform**
+
+PEIRAVELA is the AxisRobo possible-world experiment control plane. It creates
+governed simulation worlds, runs reproducible scenarios and counterfactual
+branches, injects controlled perturbations, and emits provenance-complete raw
+`SimulationEvidence` — so an autonomous-system team can safely probe what
+happens *before* it touches production.
+
+> This repository (`peiravela-open`) is one of PEIRAVELA's three tiers: the
+> **Apache-2.0 SDK/UI tier**. It publishes the generated clients, the public API
+> contract, the Studio console, examples, and prebuilt binaries. The AGPL-3.0
+> control-plane core lives in `peiravela`, and enterprise features live in
+> `peiravela-ee` (see [Three tiers](#three-tiers)).
+
+## What problem it solves
+
+Before deploying changes to autonomous systems (agents, workflows, robotics,
+security controls), you need to know **what world was run, what changed, and
+what was observed**. Most experiment tooling either fabricates results, mixes
+runs, or leaves no verifiable trace. PEIRAVELA gives operators a governed loop —
+fork, execute, observe, compare, destroy, replay — where every attempt is
+immutable, every perturbation is attributable, and every output is
+independently verifiable raw evidence.
+
+PEIRAVELA is a **raw-evidence producer**: it records facts and never asserts
+pass/fail, assurance, or release gates. Evaluator conclusions stay with the
+external evaluator.
+
+## Main features
+
+- **Governed possible worlds** — create, branch, run, and destroy isolated
+  experiment worlds with enforced state-machine lifecycles.
+- **Reproducible experiments** — scenario × perturbation × control × seed
+  matrices (catalog v2) with per-attempt reproducibility seeds recorded in
+  evidence.
+- **Provenance-complete raw evidence** — immutable content-addressed
+  `SimulationEvidence` per attempt: scenario/control digests, seed, clock,
+  measured resource usage (memory/CPU/runtime), observer health, and cleanup.
+- **Control-variant comparison** — aggregate recorded attempts per control and
+  per scenario with measured QoS facts (resource usage + runtime), in the Studio
+  and via API/CLI.
+- **Independent verification** — evidence packages exported (CLI/HTTP) and
+  consumable with standard OS tooling only (tar + SHA-256); replay inputs are
+  verified against the recorded scenario digest; PEIRA-Bench reports factual
+  replay verification and completeness.
+- **Real execution without containers** — host-telemetry measures real process
+  memory/CPU, and the localprocess adapter executes the SUT as a real OS process
+  (allowlisted), so cost/QoS evidence works on any OS.
+- **Extensible by design** — provider SPI, SUT adapter SPI (Digital/Process/
+  Twin/Robot Labs, external agent via praxovela, and the AxisRobo Agent Gateway
+  via gateway-sut), shared control resolver, and a frozen catalog v2 structure
+  contract.
+
+## Three tiers
+
+| Tier | Repository | License | Contents |
+| --- | --- | --- | --- |
+| **PEIRAVELA-open** (this repo) | github.com/axisrobo/peiravela-open | Apache-2.0 | Generated SDK clients (TS/JS), OpenAPI spec + public schemas, Studio frontend, examples/quickstart, and prebuilt binaries |
+| **PEIRAVELA-core** | github.com/axisrobo/peiravela | AGPL-3.0 | The control-plane core: scenario compiler, immutable evidence store, run/bench kernel, SUT adapters, catalogs, and operations tooling |
+| **PEIRAVELA-EE** | github.com/axisrobo/peiravela-ee | Proprietary (enterprise) | Enterprise-grade features: multi-tenancy at scale, SSO/federation, distributed scheduling, and cloud cost attribution |
+
+---
+
 # PEIRAVELA-open
 
-**PEIRAVELA** is the AxisRobo possible-world experiment control plane for
-autonomous systems: it creates governed simulation worlds, runs reproducible
-scenario × perturbation × control × seed experiments, and emits
-provenance-complete raw `SimulationEvidence` that any independent evaluator can
-verify. This repository is the **Apache-2.0 SDK/UI tier** of PEIRAVELA —
-generated client libraries, the public API contract, the Studio frontend,
-examples, and binaries. The AGPL-3.0 control-plane core lives in the
-`peiravela` repository; enterprise features live in `peiravela-ee`.
-
-## What this gives you
+**The Apache-2.0 SDK/UI tier of PEIRAVELA.** This repository publishes everything
+a consumer needs to drive, embed, or independently verify a PEIRAVELA
+deployment without depending on the AGPL core:
 
 - **Generated TypeScript and JavaScript clients** for the PEIRAVELA control-plane
   API, so you can drive worlds, runs, evidence, and control-variant comparison
@@ -19,6 +77,9 @@ examples, and binaries. The AGPL-3.0 control-plane core lives in the
 - **The Studio console** frontend (themes/embed source under Apache-2.0).
 - **Examples and an independent evidence verifier** (tar + SHA-256 only) so an
   external evaluator never has to trust PEIRAVELA's tooling.
+- **Prebuilt AGPL-3.0 core binaries** (`peiravela-api-server`,
+  `peiravela-control-plane`, Linux amd64 + Windows amd64 `.exe`) tagged with the
+  matching core release.
 
 ## What's here
 
@@ -31,7 +92,7 @@ examples, and binaries. The AGPL-3.0 control-plane core lives in the
 | `contracts/fixtures/valid/` | Public valid fixtures for the schemas |
 | `studio/` | The Studio console frontend (served by the core API server) |
 | `examples/` | Quickstart and worked examples |
-| `bin/` | Prebuilt AGPL-3.0 core binaries (`peiravela-api-server`, `peiravela-control-plane`), Linux amd64 + Windows amd64 (`.exe`), tagged with the matching core release version |
+| `bin/` | Prebuilt AGPL-3.0 core binaries, Linux amd64 + Windows amd64 (`.exe`), tagged with the matching core release version |
 | `scripts/verify-package-independent.ps1` | Independent evidence-package consumer (tar + SHA-256 only) |
 
 ## Using the SDK
