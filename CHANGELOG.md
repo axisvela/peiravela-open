@@ -3,6 +3,19 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [0.4.0] - 2026-08-13
+
+Mirrored from the core `peiravela` tag `v0.4.0` (gateway SUT adapter
+`gateway-sut` with real LIMENORA protocol alignment, EASEF attack-corpus
+scenarios, and full-chain dual-PEP evidence; see the core CHANGELOG):
+
+- Prebuilt AGPL-3.0 core binaries committed under `bin/` for `v0.4.0` (Linux
+  amd64 + Windows amd64 `.exe`, version embedded via `-ldflags`).
+- GitHub Release `v0.4.0` published with the binaries and the core changelog
+  diff (`v0.3.0-beta` → `v0.4.0`).
+- No SDK/OpenAPI/Studio surface changes in this version; the gateway-sut work
+  is core-only and does not alter the generated client surface.
+
 ## [0.3.0-beta] - 2026-08-12
 
 Beta label applied across all three tiers, mirrored from the core `peiravela`
