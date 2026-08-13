@@ -3,6 +3,13 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [Unreleased]
+
+- Studio **access-control gate**: the entry page loads without credentials so
+  the sign-in surface renders; every API call carries the entered credential
+  (`X-PEIRAVELA-API-Key` or `Authorization: Bearer`), persisted per-browser.
+  Synced from the core `peiravela` Studio.
+
 ## [0.5.0] - 2026-08-13
 
 Mirrored from the core `peiravela` tag `v0.5.0` (v2 evidence contract with a

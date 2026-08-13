@@ -55,6 +55,11 @@
   .tl-item::before { content:""; position:absolute; left:-19px; top:16px; width:8px; height:8px; border-radius:50%; background:var(--accent); }
   .tl-item.failed::before { background:var(--err); }
   .hidden { display:none; }
+  .auth-gate { position:fixed; inset:0; background:rgba(10,14,22,.9); display:flex; align-items:center; justify-content:center; z-index:50; }
+  .auth-card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:22px 26px; width:min(420px, 90vw); }
+  .auth-card h2 { margin-top:0; }
+  .auth-card .field { margin:10px 0; }
+  .auth-card input { width:100%; box-sizing:border-box; }
 </style>
 </head>
 <body>
@@ -64,9 +69,23 @@
     <label for="api-base">API base</label>
     <input id="api-base" placeholder="/" value="">
     <input type="password" id="api-key" placeholder="Bearer token / API key (optional)">
+    <span id="auth-status" class="muted"></span>
     <button id="reload">Reload</button>
   </div>
 </header>
+<div id="auth-gate" class="auth-gate hidden">
+  <div class="auth-card">
+    <h2>Authentication required</h2>
+    <p class="muted">This control plane enforces access control. Enter the API
+      key or Bearer token configured on the server
+      (<code>PEIRAVELA_API_KEY</code> / <code>PEIRAVELA_API_KEYS</code> or an
+      OIDC access token) to continue.</p>
+    <div class="field"><label for="auth-key">Credential</label>
+      <input type="password" id="auth-key" placeholder="Bearer token / API key" autocomplete="off"></div>
+    <div id="auth-msg" class="msg"></div>
+    <button id="auth-signin" class="primary">Sign in</button>
+  </div>
+</div>
 <nav id="nav">
   <button data-panel="overview" class="active">Overview</button>
   <button data-panel="catalog">Catalog</button>
@@ -338,10 +357,15 @@ import PeiravelaClient from "./peiravela.js";
 
 const apiBaseInput = document.getElementById("api-base");
 const apiKeyInput = document.getElementById("api-key");
+const authStorageKey = "peiravela.studio.auth";
+function persistedKey() { try { return localStorage.getItem(authStorageKey) || ""; } catch { return ""; } }
+function persistKey(key) {
+  try { if (key) localStorage.setItem(authStorageKey, key); else localStorage.removeItem(authStorageKey); } catch {}
+}
+apiKeyInput.value = persistedKey();
 
 function client() {
-  const c = new PeiravelaClient(apiBaseInput.value.trim() || "", {});
-  return c;
+  return new PeiravelaClient(apiBaseInput.value.trim() || "", authHeaders());
 }
 function authHeaders() {
   const key = apiKeyInput.value.trim();
@@ -406,10 +430,12 @@ function panelLoaders() {
   };
 }
 $("reload").addEventListener("click", () => {
+  persistKey(apiKeyInput.value.trim());
   const active = document.querySelector("nav button.active").dataset.panel;
   const loaders = panelLoaders();
   if (loaders[active]) run(loaders[active]);
 });
+$("api-key").addEventListener("change", () => { persistKey(apiKeyInput.value.trim()); window.location.reload(); });
 
 async function loadOverview() {
   const [sb, ad, health, audit, runs] = await Promise.all([
@@ -1095,13 +1121,42 @@ function renderAudit() {
 $("audit-filter").addEventListener("input", renderAudit);
 $("audit-limit").addEventListener("change", () => run(loadAudit));
 
-run(loadOverview);
-run(loadRuns);
-run(loadBranches);
-run(loadWorlds);
-run(loadExperiments);
-run(loadBindings);
-run(loadAudit);
+// Authentication gate: the Studio entry is served without credentials, but
+// every API call requires the control plane's access control. Probe on load;
+// if unauthorized, hold the UI behind the sign-in card until a valid
+// credential is entered (persisted so a reload stays signed in).
+let authenticated = false;
+async function probeAuth() {
+  const gate = $("auth-gate");
+  try {
+    await api("/health");
+    authenticated = true;
+    gate.classList.add("hidden");
+    out("auth-status", '<span class="badge">signed in</span>');
+  } catch (err) {
+    authenticated = false;
+    out("auth-msg", '<span class="err">' + esc(err.message || err) + "</span>");
+    gate.classList.remove("hidden");
+  }
+}
+$("auth-signin").addEventListener("click", () => {
+  const key = $("auth-key").value.trim();
+  persistKey(key);
+  apiKeyInput.value = key;
+  window.location.reload();
+});
+
+(async () => {
+  await probeAuth();
+  if (!authenticated) return;
+  run(loadOverview);
+  run(loadRuns);
+  run(loadBranches);
+  run(loadWorlds);
+  run(loadExperiments);
+  run(loadBindings);
+  run(loadAudit);
+})();
 </script>
 </body>
 </html>
