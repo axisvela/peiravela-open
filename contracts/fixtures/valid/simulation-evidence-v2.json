@@ -1,0 +1,32 @@
+{
+  "api_version": "peiravela/v2",
+  "kind": "SimulationEvidence",
+  "experiment_id": "gateway-experiment",
+  "run_id": "run-002",
+  "attempt_id": "attempt-002",
+  "inputs": {
+    "world_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "scenario_digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+    "sut_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "execution": {"seed": 202, "started_at": "2026-08-13T00:00:00Z", "ended_at": "2026-08-13T00:00:01Z", "exit_status": "completed"},
+  "observations": {"missing_event_declaration": "none"},
+  "integrity": {"artifact_manifest_digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888"},
+  "cleanup": {"verified": true, "residual_scan_ref": "artifact://residual-scan.json"},
+  "auth": {
+    "steps": [
+      {
+        "step_id": "s1",
+        "chain": ["h", "a", "k", "s"],
+        "principals": {"h": "agent-a", "a": "agent-a", "s": "https://api.enterprise.com/crm/contacts"},
+        "declared_absent": []
+      },
+      {
+        "step_id": "s2",
+        "chain": ["h", "a", "s"],
+        "principals": {"h": "agent-a", "a": "agent-a", "s": "https://api.enterprise.com/orders"},
+        "declared_absent": ["k"]
+      }
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/simulation-evidence-v2.json",
+  "title": "PEIRAVELA SimulationEvidence v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "experiment_id", "run_id", "attempt_id", "inputs", "execution", "observations", "integrity", "cleanup"],
+  "properties": {
+    "api_version": {"const": "peiravela/v2"},
+    "kind": {"const": "SimulationEvidence"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "inputs": {"type": "object", "required": ["world_digest", "scenario_digest", "sut_digest"]},
+    "execution": {"type": "object", "required": ["seed", "started_at", "ended_at", "exit_status"]},
+    "observations": {"type": "object", "required": ["missing_event_declaration"]},
+    "integrity": {"type": "object", "required": ["artifact_manifest_digest"]},
+    "cleanup": {"type": "object", "required": ["verified", "residual_scan_ref"], "properties": {"verified": {"type": "boolean"}, "residual_scan_ref": {"type": "string", "minLength": 1}}},
+    "auth": {
+      "type": "object",
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_id", "chain", "declared_absent"],
+            "properties": {
+              "step_id": {"type": "string", "minLength": 1},
+              "chain": {"type": "array", "items": {"type": "string", "enum": ["h", "a", "k", "s"]}},
+              "principals": {"type": "object", "additionalProperties": {"type": "string"}},
+              "declared_absent": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    }
+  }
+}

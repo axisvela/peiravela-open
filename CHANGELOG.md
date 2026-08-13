@@ -3,6 +3,22 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [0.5.0] - 2026-08-13
+
+Mirrored from the core `peiravela` tag `v0.5.0` (v2 evidence contract with a
+top-level `auth` block for EASEF P11 auth-chain facts; see the core
+CHANGELOG):
+
+- Prebuilt AGPL-3.0 core binaries committed under `bin/` for `v0.5.0` (Linux
+  amd64 + Windows amd64 `.exe`, version embedded via `-ldflags`).
+- Contract surface synced: `contracts/schemas/simulation-evidence-v2.schema.json`
+  (`api_version: peiravela/v2`, optional `auth` block) registered in the bundle
+  index, with a valid fixture under `contracts/fixtures/valid/`.
+- GitHub Release `v0.5.0` published with the binaries and the core changelog
+  diff (`v0.4.0` → `v0.5.0`).
+- No SDK/Studio surface changes; the generated TS/JS client is unchanged (the
+  codegen only globs `*-v1` schemas).
+
 ## [0.4.0] - 2026-08-13
 
 Mirrored from the core `peiravela` tag `v0.4.0` (gateway SUT adapter
