@@ -3,12 +3,21 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
-## [Unreleased]
+## [0.6.0] - 2026-08-13
 
+Mirrored from the core `peiravela` tag `v0.6.0` (distributed execution and
+Studio access control; see the core CHANGELOG):
+
+- Prebuilt AGPL-3.0 core binaries committed under `bin/` for `v0.6.0` (Linux
+  amd64 + Windows amd64 `.exe`, version embedded via `-ldflags`).
+- Generated TS client exposes every published schema version: `SimulationEvidenceV2`
+  (optional `auth` block) and `SuiteCatalog`, alongside the v1 surfaces.
 - Studio **access-control gate**: the entry page loads without credentials so
   the sign-in surface renders; every API call carries the entered credential
   (`X-PEIRAVELA-API-Key` or `Authorization: Bearer`), persisted per-browser.
-  Synced from the core `peiravela` Studio.
+- README rewritten to lead with the PEIRAVELA product before the SDK/UI tier.
+- GitHub Release `v0.6.0` published with the binaries and the core changelog
+  diff (`v0.5.0` → `v0.6.0`).
 
 ## [0.5.0] - 2026-08-13
 
