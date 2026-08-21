@@ -38,6 +38,9 @@ external evaluator.
 - **Provenance-complete raw evidence** — immutable content-addressed
   `SimulationEvidence` per attempt: scenario/control digests, seed, clock,
   measured resource usage (memory/CPU/runtime), observer health, and cleanup.
+  The additive v3 contract records sim-to-real metadata (epistemic labels,
+  calibration/fidelity, declared absence) with unified identity/capability/
+  event facts.
 - **Control-variant comparison** — aggregate recorded attempts per control and
   per scenario with measured QoS facts (resource usage + runtime), in the Studio
   and via API/CLI.
@@ -45,13 +48,14 @@ external evaluator.
   consumable with standard OS tooling only (tar + SHA-256); replay inputs are
   verified against the recorded scenario digest; PEIRA-Bench reports factual
   replay verification and completeness.
-- **Real execution without containers** — host-telemetry measures real process
-  memory/CPU, and the localprocess adapter executes the SUT as a real OS process
-  (allowlisted), so cost/QoS evidence works on any OS.
+- **Real execution** — host-telemetry measures real process memory/CPU, the
+  localprocess adapter executes the SUT as a real OS process (allowlisted), and
+  the container provider runs SUT commands inside an isolated container with
+  default-deny egress and cgroup-enforced resource limits (Linux).
 - **Extensible by design** — provider SPI, SUT adapter SPI (Digital/Process/
-  Twin/Robot Labs, external agent via praxovela, and the AxisRobo Agent Gateway
-  via gateway-sut), shared control resolver, and a frozen catalog v2 structure
-  contract.
+  Twin/Robot Labs, physics-sut, external agent via praxovela, and the AxisRobo
+  Agent Gateway via gateway-sut), shared control resolver, and a frozen catalog
+  v2 structure contract.
 
 ## Three tiers
 
