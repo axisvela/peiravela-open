@@ -1,0 +1,92 @@
+{
+  "api_version": "peiravela/v3",
+  "kind": "SimulationEvidence",
+  "experiment_id": "sim-to-real-experiment",
+  "run_id": "run-003",
+  "attempt_id": "attempt-003",
+  "inputs": {
+    "world_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "scenario_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "sut_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+  },
+  "execution": {"seed": 303, "started_at": "2026-08-21T00:00:00Z", "ended_at": "2026-08-21T00:00:02Z", "exit_status": "completed"},
+  "observations": {"missing_event_declaration": "none"},
+  "integrity": {"artifact_manifest_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444"},
+  "cleanup": {"verified": true, "residual_scan_ref": "artifact://residual-scan.json"},
+  "sim_to_real": {
+    "state_label": "synthetic",
+    "field_metadata_mapping": {
+      "sim_pose_origin": "field/twin/pose-origin",
+      "sim_sensor_noise_stddev": "field/telemetry/sensor-noise"
+    },
+    "calibration": [
+      {
+        "source": "sensor-model",
+        "metric": "pose_drift",
+        "value": "0.3",
+        "unit": "m",
+        "declared_absent": false
+      }
+    ],
+    "fidelity": {
+      "confidence": 0.92,
+      "criteria": ["kinematic-match", "sensor-noise-match"],
+      "declared_absent": false
+    },
+    "declared_absent": ["real_twin_telemetry", "field_ground_truth"]
+  },
+  "identity": {
+    "actors": [
+      {
+        "actor_id": "robot-r01",
+        "actor_type": "robot",
+        "principal": "principal-r01",
+        "declared_absent": []
+      },
+      {
+        "actor_id": "service-s01",
+        "actor_type": "service",
+        "declared_absent": ["principal"]
+      }
+    ]
+  },
+  "capabilities": {
+    "sut": [
+      {
+        "capability": "robot-mission",
+        "adapter": "robot-sut",
+        "supported": true
+      },
+      {
+        "capability": "physics-state",
+        "adapter": "physics-sut",
+        "supported": true
+      }
+    ],
+    "control": [
+      {
+        "capability": "actuator-fault",
+        "adapter": "robot-sut",
+        "supported": true
+      }
+    ],
+    "declared_absent": ["kinematics-engine"]
+  },
+  "events": [
+    {
+      "event_id": "evt-01",
+      "kind": "robot-mission",
+      "actor_id": "robot-r01",
+      "at": "2026-08-21T00:00:01Z",
+      "payload_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "declared_absent": false
+    },
+    {
+      "event_id": "evt-02",
+      "kind": "physics-state",
+      "actor_id": "world-sim",
+      "at": "2026-08-21T00:00:02Z",
+      "declared_absent": true
+    }
+  ]
+}

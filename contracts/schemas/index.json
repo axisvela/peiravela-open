@@ -9,6 +9,7 @@
     "run_manifest": "run-manifest-v1.schema.json",
     "simulation_evidence": "simulation-evidence-v1.schema.json",
     "simulation_evidence_v2": "simulation-evidence-v2.schema.json",
+    "simulation_evidence_v3": "simulation-evidence-v3.schema.json",
     "evidence_package": "evidence-package-v1.schema.json",
     "experiment_source_binding": "experiment-source-binding-v1.schema.json",
     "security_lab_profile": "security-lab-profile-v1.schema.json",

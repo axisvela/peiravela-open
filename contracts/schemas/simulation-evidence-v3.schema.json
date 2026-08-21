@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://peiravela.axisrobo.example/schemas/simulation-evidence-v3.json",
+  "title": "PEIRAVELA SimulationEvidence v3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "kind", "experiment_id", "run_id", "attempt_id", "inputs", "execution", "observations", "integrity", "cleanup"],
+  "properties": {
+    "api_version": {"const": "peiravela/v3"},
+    "kind": {"const": "SimulationEvidence"},
+    "experiment_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "attempt_id": {"type": "string", "minLength": 1},
+    "inputs": {"type": "object", "required": ["world_digest", "scenario_digest", "sut_digest"]},
+    "execution": {"type": "object", "required": ["seed", "started_at", "ended_at", "exit_status"]},
+    "observations": {"type": "object", "required": ["missing_event_declaration"]},
+    "integrity": {"type": "object", "required": ["artifact_manifest_digest"]},
+    "cleanup": {"type": "object", "required": ["verified", "residual_scan_ref"], "properties": {"verified": {"type": "boolean"}, "residual_scan_ref": {"type": "string", "minLength": 1}}},
+    "auth": {
+      "type": "object",
+      "required": ["steps"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step_id", "chain", "declared_absent"],
+            "properties": {
+              "step_id": {"type": "string", "minLength": 1},
+              "chain": {"type": "array", "items": {"type": "string", "enum": ["h", "a", "k", "s"]}},
+              "principals": {"type": "object", "additionalProperties": {"type": "string"}},
+              "declared_absent": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    "sim_to_real": {
+      "type": "object",
+      "required": ["state_label", "declared_absent"],
+      "properties": {
+        "state_label": {"type": "string", "enum": ["synthetic", "observed", "replayed", "predicted", "derived"]},
+        "field_metadata_mapping": {"type": "object", "additionalProperties": {"type": "string"}},
+        "calibration": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "metric", "value", "declared_absent"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "metric": {"type": "string", "minLength": 1},
+              "value": {"type": "string", "minLength": 1},
+              "unit": {"type": "string"},
+              "declared_absent": {"type": "boolean"}
+            }
+          }
+        },
+        "fidelity": {
+          "type": "object",
+          "required": ["declared_absent"],
+          "properties": {
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "criteria": {"type": "array", "items": {"type": "string"}},
+            "declared_absent": {"type": "boolean"}
+          }
+        },
+        "declared_absent": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": ["actors"],
+      "properties": {
+        "actors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["actor_id", "actor_type"],
+            "properties": {
+              "actor_id": {"type": "string", "minLength": 1},
+              "actor_type": {"type": "string", "enum": ["agent", "robot", "workflow", "service"]},
+              "principal": {"type": "string"},
+              "declared_absent": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "properties": {
+        "sut": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["capability", "adapter", "supported"],
+            "properties": {
+              "capability": {"type": "string", "minLength": 1},
+              "adapter": {"type": "string", "minLength": 1},
+              "supported": {"type": "boolean"}
+            }
+          }
+        },
+        "control": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["capability", "adapter", "supported"],
+            "properties": {
+              "capability": {"type": "string", "minLength": 1},
+              "adapter": {"type": "string", "minLength": 1},
+              "supported": {"type": "boolean"}
+            }
+          }
+        },
+        "declared_absent": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["event_id", "kind", "actor_id", "at", "declared_absent"],
+        "properties": {
+          "event_id": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "minLength": 1},
+          "actor_id": {"type": "string", "minLength": 1},
+          "at": {"type": "string", "format": "date-time"},
+          "payload_digest": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+          "declared_absent": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}

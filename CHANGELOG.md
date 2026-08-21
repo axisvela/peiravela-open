@@ -3,6 +3,22 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [1.0.0] - 2026-08-21
+
+Mirrored from the core `peiravela` tag `v1.0.0` (Phase 3 contract-freeze
+milestone: v3 evidence contract + physics SUT adapter; see the core
+CHANGELOG):
+
+- Generated TS client exposes the v3 evidence contract: `SimulationEvidenceV3`
+  with the top-level `sim_to_real` / `identity` / `capabilities` / `events`
+  blocks, alongside the v1/v2 surfaces.
+- Contract surface synced: `contracts/schemas/simulation-evidence-v3.schema.json`
+  (`api_version: peiravela/v3`) registered in the bundle index, with a valid
+  fixture under `contracts/fixtures/valid/`.
+- GitHub Release `v1.0.0` published with the prebuilt AGPL-3.0 core binaries
+  (Linux amd64 + Windows amd64 `.exe`, version embedded) and the core changelog
+  diff (`v0.7.0` → `v1.0.0`).
+
 ## [0.7.0] - 2026-08-13
 
 Mirrored from the core `peiravela` tag `v0.7.0` (container real execution; see

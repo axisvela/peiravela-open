@@ -153,6 +153,24 @@ export interface SimulationEvidenceV2 {
   run_id: string;
 }
 
+export interface SimulationEvidenceV3 {
+  api_version: "peiravela/v3";
+  attempt_id: string;
+  auth?: { steps: { chain: "h" | "a" | "k" | "s"[]; declared_absent: string[]; principals?: Record<string, unknown>; step_id: string }[] };
+  capabilities?: { control?: { adapter: string; capability: string; supported: boolean }[]; declared_absent?: string[]; sut?: { adapter: string; capability: string; supported: boolean }[] };
+  cleanup: { residual_scan_ref: string; verified: boolean };
+  events?: { actor_id: string; at: string; declared_absent: boolean; event_id: string; kind: string; payload_digest?: string }[];
+  execution: Record<string, unknown>;
+  experiment_id: string;
+  identity?: { actors: { actor_id: string; actor_type: "agent" | "robot" | "workflow" | "service"; declared_absent?: string[]; principal?: string }[] };
+  inputs: Record<string, unknown>;
+  integrity: Record<string, unknown>;
+  kind: "SimulationEvidence";
+  observations: Record<string, unknown>;
+  run_id: string;
+  sim_to_real?: { calibration?: { declared_absent: boolean; metric: string; source: string; unit?: string; value: string }[]; declared_absent: string[]; fidelity?: { confidence?: number; criteria?: string[]; declared_absent: boolean }; field_metadata_mapping?: Record<string, unknown>; state_label: "synthetic" | "observed" | "replayed" | "predicted" | "derived" };
+}
+
 export interface SuiteCatalog {
   api_version: "peiravela/v2";
   controls?: { adapter: string; id: string; options?: Record<string, unknown>; selectors?: string[] }[];
