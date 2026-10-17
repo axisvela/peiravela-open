@@ -61,9 +61,9 @@ external evaluator.
 
 | Tier | Repository | License | Contents |
 | --- | --- | --- | --- |
-| **PEIRAVELA-open** (this repo) | github.com/axisrobo/peiravela-open | Apache-2.0 | Generated SDK clients (TS/JS), OpenAPI spec + public schemas, Studio frontend, examples/quickstart, and prebuilt binaries |
-| **PEIRAVELA-core** | github.com/axisrobo/peiravela | AGPL-3.0 | The control-plane core: scenario compiler, immutable evidence store, run/bench kernel, SUT adapters, catalogs, and operations tooling |
-| **PEIRAVELA-EE** | github.com/axisrobo/peiravela-ee | Proprietary (enterprise) | Enterprise-grade features: multi-tenancy at scale, SSO/federation, distributed scheduling, and cloud cost attribution |
+| **PEIRAVELA-open** (this repo) | github.com/axisvela/peiravela-open | Apache-2.0 | Generated SDK clients (TS/JS), OpenAPI spec + public schemas, Studio frontend, examples/quickstart, and prebuilt binaries |
+| **PEIRAVELA-core** | github.com/axisvela/peiravela | AGPL-3.0 | The control-plane core: scenario compiler, immutable evidence store, run/bench kernel, SUT adapters, catalogs, and operations tooling |
+| **PEIRAVELA-EE** | github.com/axisvela/peiravela-ee | Proprietary (enterprise) | Enterprise-grade features: multi-tenancy at scale, SSO/federation, distributed scheduling, and cloud cost attribution |
 
 ---
 
