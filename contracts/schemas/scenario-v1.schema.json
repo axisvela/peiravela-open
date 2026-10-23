@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/scenario-v1.json",
+  "$id": "https://peiravela.axisvela.example/schemas/scenario-v1.json",
   "title": "PEIRAVELA Scenario v1",
   "type": "object",
   "additionalProperties": false,

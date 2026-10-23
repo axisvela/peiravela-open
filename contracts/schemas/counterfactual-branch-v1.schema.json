@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/counterfactual-branch-v1.json",
+  "$id": "https://peiravela.axisvela.example/schemas/counterfactual-branch-v1.json",
   "title": "PEIRAVELA CounterfactualBranch v1",
   "type": "object",
   "additionalProperties": false,

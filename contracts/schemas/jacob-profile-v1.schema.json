@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/jacob-profile-v1.json",
+  "$id": "https://peiravela.axisvela.example/schemas/jacob-profile-v1.json",
   "title": "PEIRAVELA JACoB Profile v1",
   "type": "object",
   "additionalProperties": false,

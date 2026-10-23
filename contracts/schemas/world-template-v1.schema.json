@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/world-template-v1.json",
+  "$id": "https://peiravela.axisvela.example/schemas/world-template-v1.json",
   "title": "PEIRAVELA WorldTemplate v1",
   "type": "object",
   "additionalProperties": false,
