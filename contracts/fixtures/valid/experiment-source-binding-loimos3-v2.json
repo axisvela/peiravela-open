@@ -1,7 +1,7 @@
 {
   "api_version": "peiravela/v1",
   "kind": "ExperimentSourceBinding",
-  "source_id": "axisrobo",
+  "source_id": "axisvela",
   "source_kind": "scenario-catalog",
   "source_revision": "v2-draft",
   "source_digest": "sha256:e120696de66467d94112d1281c7545dcc506a9865e905fb883781e94c3ec17a2",

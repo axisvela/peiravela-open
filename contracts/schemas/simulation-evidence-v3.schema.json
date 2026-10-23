@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/simulation-evidence-v3.json",
+  "$id": "https://peiravela.axisvela.example/schemas/simulation-evidence-v3.json",
   "title": "PEIRAVELA SimulationEvidence v3",
   "type": "object",
   "additionalProperties": false,

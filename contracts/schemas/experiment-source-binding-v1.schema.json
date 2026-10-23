@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://peiravela.axisrobo.example/schemas/experiment-source-binding-v1.json",
+  "$id": "https://peiravela.axisvela.example/schemas/experiment-source-binding-v1.json",
   "title": "PEIRAVELA Experiment Source Binding v1",
   "type": "object",
   "additionalProperties": false,

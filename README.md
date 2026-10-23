@@ -2,7 +2,7 @@
 
 **Autonomous-System Simulation, Experimentation & Validation Platform**
 
-PEIRAVELA is the AxisRobo possible-world experiment control plane. It creates
+PEIRAVELA is the AxisVela possible-world experiment control plane. It creates
 governed simulation worlds, runs reproducible scenarios and counterfactual
 branches, injects controlled perturbations, and emits provenance-complete raw
 `SimulationEvidence` — so an autonomous-system team can safely probe what
@@ -53,7 +53,7 @@ external evaluator.
   the container provider runs SUT commands inside an isolated container with
   default-deny egress and cgroup-enforced resource limits (Linux).
 - **Extensible by design** — provider SPI, SUT adapter SPI (Digital/Process/
-  Twin/Robot Labs, physics-sut, external agent via praxovela, and the AxisRobo
+  Twin/Robot Labs, physics-sut, external agent via praxovela, and the AxisVela
   Agent Gateway via gateway-sut), shared control resolver, and a frozen catalog
   v2 structure contract.
 
@@ -139,7 +139,7 @@ Binaries are built from the AGPL-3.0 core and distributed under AGPL-3.0 terms
 (see the `peiravela` repository). Release assets are attached to the tags on
 this repository's Releases page; the build workflow checks out the private core
 and requires the `PEIRAVELA_CORE_CHECKOUT_TOKEN` secret (a repo-scoped PAT with
-read access to `axisrobo/peiravela`) until the core is made public.
+read access to `axisvela/peiravela`) until the core is made public.
 
 ## Studio
 
