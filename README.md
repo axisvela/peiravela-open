@@ -76,6 +76,8 @@ deployment without depending on the AGPL core:
 - **Generated TypeScript and JavaScript clients** for the PEIRAVELA control-plane
   API, so you can drive worlds, runs, evidence, and control-variant comparison
   from your own code.
+- **The public Go SDK** (`sdk/go/`) exposing the SUT adapter SPI and registry so
+  external repositories can implement adapters without importing the AGPL core.
 - **The public API contract** (OpenAPI) and the format schemas that make every
   `SimulationEvidence` package independently verifiable.
 - **The Studio console** frontend (themes/embed source under Apache-2.0).
@@ -91,6 +93,7 @@ deployment without depending on the AGPL core:
 | --- | --- |
 | `sdk/ts/peiravela.ts` | Generated TypeScript client (from the OpenAPI spec) |
 | `sdk/js/peiravela.js` | Generated JavaScript client (ES module) |
+| `sdk/go/` | Public Go SDK exposing the SUT adapter SPI and registry |
 | `contracts/openapi/peiravela-v1.openapi.json` | Public REST API specification |
 | `contracts/schemas/` | Public format contracts (scenario, evidence, catalog v2, ...) |
 | `contracts/fixtures/valid/` | Public valid fixtures for the schemas |
@@ -132,6 +135,17 @@ npm run typecheck
 ```
 
 A JavaScript example is in `examples/js-client/demo.mjs` (ES module).
+
+The Go SDK exposes the SUT adapter SPI:
+
+```go
+import peirasut "github.com/axisvela/peiravela-open/sdk/go/v3/sut"
+
+peirasut.RegisterAdapter(peirasut.NewRegistry(), myAdapter)
+```
+
+See [`sdk/go/README.md`](sdk/go/README.md) for the adapter interface and
+validation commands.
 
 ## Prebuilt binaries
 

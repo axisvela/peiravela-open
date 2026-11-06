@@ -25,6 +25,16 @@ jobs:
         with:
           node-version: "22"
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+
+      - name: Go SDK vets and tests
+        working-directory: sdk/go
+        run: |
+          go vet ./...
+          go test ./...
+
       - name: OpenAPI and schemas are valid JSON
         run: |
           node -e "const fs=require('fs');const files=['contracts/openapi/peiravela-v1.openapi.json',...fs.readdirSync('contracts/schemas').filter(f=>f.endsWith('.json')).map(f=>'contracts/schemas/'+f)];for(const f of files){JSON.parse(fs.readFileSync(f,'utf8'));console.log('ok',f)}"
