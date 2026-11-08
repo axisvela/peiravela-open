@@ -28,6 +28,15 @@ PEIRAVELA is a **raw-evidence producer**: it records facts and never asserts
 pass/fail, assurance, or release gates. Evaluator conclusions stay with the
 external evaluator.
 
+PEIRAVELA retains worlds, scenarios, run attempts, perturbations, and raw
+`SimulationEvidence`. Target capture admission, episodes, datasets, labels,
+training, and candidate artifacts belong to DIDACTOVELA. Raw integrity/replay
+verification is not TEKMOVELA final assurance; a candidate does not authorize
+deployment. AKROVELA and DIDACTOVELA are unreleased `0.1.0` bootstrap only, with
+no functional integrations or default changes. See the
+[family architecture](https://github.com/axisvela/axisvela/blob/main/EDGE-AND-LEARNING-ARCHITECTURE.md)
+and [authority boundaries](https://github.com/axisvela/axisvela/blob/main/AUTHORITY-BOUNDARIES.md).
+
 ## Main features
 
 - **Governed possible worlds** — create, branch, run, and destroy isolated
