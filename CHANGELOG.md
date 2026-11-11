@@ -3,6 +3,21 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [3.1.0] - 2026-11-11
+
+Mirrored from the core `peiravela` tag `v3.1.0` (akrovela-nav2 SUT adapter and
+contract bundle v2; see the core CHANGELOG). This is the first open changelog
+entry after the v3 module/tag migration.
+
+- Add the public Go SDK SUT adapter SPI under `sdk/go/v3/sut`, so an external
+  repository can implement and register a System-Under-Test adapter without
+  importing the AGPL-3.0 core.
+- Sync the public contract/docs surface with the AxisVela rename and
+  `peiravela-contracts-v2`; no underlying wire schema change.
+- The SDK module tag remains `sdk/go/v3.0.0` because no SDK content changed after
+  that tag; the product tag for this release is `v3.1.0`.
+- No prebuilt core binaries are mirrored by this release record.
+
 ## [1.0.0] - 2026-08-21
 
 Mirrored from the core `peiravela` tag `v1.0.0` (Phase 3 contract-freeze
