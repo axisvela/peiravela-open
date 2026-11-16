@@ -3,6 +3,17 @@
 All notable changes to the Apache-2.0 SDK/UI surface are recorded here. The
 AGPL-3.0 core changelog lives in the `peiravela` repository.
 
+## [3.2.0] - 2026-11-16
+
+Mirrored from the core `peiravela` tag `v3.2.0` (catalog v3 asset support; see
+the core CHANGELOG).
+
+- Catalog `suite-catalog-v3` adds pinned world/map assets; the contract bundle is
+  `peiravela-contracts-v3`.
+- The `robot-lab-nav2` catalog is migrated to `peiravela/v3` with structural
+  `warehouse-aisle-a` assets. The assets are not Gazebo-validated.
+- No SDK/OpenAPI/Studio surface change; the SDK tag remains `sdk/go/v3.0.0`.
+
 ## [3.1.0] - 2026-11-11
 
 Mirrored from the core `peiravela` tag `v3.1.0` (akrovela-nav2 SUT adapter and
